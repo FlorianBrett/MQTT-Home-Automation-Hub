@@ -16,7 +16,6 @@ private:
 	std::string message;
 public:
 	MQTTMessage(std::string inTopic,std::string inMessage);
-	int getTest();
 	std::string getTopic();
 	std::string getMessage();
 	virtual ~MQTTMessage();

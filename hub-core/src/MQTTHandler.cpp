@@ -65,8 +65,6 @@ void MQTTHandler::cb_ConnectSuccess(void* context, MQTTAsync_successData* respon
 	//MQTTAsync_message pubmsg = MQTTAsync_message_initializer;
 	int rc;
 
-	printf("Subscribing to topic %s for client %s using QoS%d\n\n"
-           "Press Q<Enter> to quit\n\n", TOPIC2, CLIENTID, 1);
 	opts.onSuccess = cb_SubscribeSuccess;
 	opts.onFailure = cb_SubscribeFailure;
 	opts.context = client;
@@ -103,7 +101,6 @@ MQTTHandler::MQTTHandler() {
 
 	MQTTAsync_create(&client, ADDRESS, CLIENTID, MQTTCLIENT_PERSISTENCE_NONE, NULL);
 	MQTTAsync_setCallbacks(client, NULL, &cb_ConnectionLost, *cb_MessageArrived, NULL);
-	printf("does it reach here? 2");
 	conn_opts.context = client;
 	conn_opts.username = USERNAME;
 	conn_opts.password = PASSWORD;
@@ -113,7 +110,6 @@ MQTTHandler::MQTTHandler() {
 	conn_opts.onSuccess = cb_ConnectSuccess;
 	conn_opts.onFailure = cb_ConnectFailure;
 
-	printf("does it reach here? 3 ");
 	if ((rc = MQTTAsync_connect(client, &conn_opts)) != MQTTASYNC_SUCCESS)
 	{
 		printf("Failed to start connect, return code %d\n", rc);
