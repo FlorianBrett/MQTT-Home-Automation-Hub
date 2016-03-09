@@ -16,8 +16,8 @@ void MQTTMessageBuffer::add(MQTTMessage inMessage)
 {
 	std::unique_lock<std::mutex> lck (mtx);
 	while (inMessageBuffer.size() >= bufferSize) cv.wait(lck);
-	std::cout <<"Buffer: add Size:" << inMessageBuffer.size() << '\n';
 	inMessageBuffer.push_back(inMessage);
+	std::cout <<"Buffer: add Size:" << inMessageBuffer.size() << '\n';
 	lck.unlock();
 	cv.notify_all();
 }
@@ -25,9 +25,9 @@ MQTTMessage MQTTMessageBuffer::remove()
 {
 	std::unique_lock<std::mutex> lck (mtx);
 	while (inMessageBuffer.size() <= 0) cv.wait(lck);
-	std::cout <<"Buffer: remove Size:" << inMessageBuffer.size() << '\n';
 	MQTTMessage outMessage = inMessageBuffer.back();
 	inMessageBuffer.pop_back();
+	std::cout <<"Buffer: remove Size:" << inMessageBuffer.size() << '\n';
 	lck.unlock();
 	cv.notify_all();
 	return outMessage;

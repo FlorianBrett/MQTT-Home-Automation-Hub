@@ -30,12 +30,25 @@ extern "C" {
 // CALLBACKS
 
 bool MQTTHandler::connectedStatic = false;
+MQTTMessageBuffer *MQTTHandler::inBuffer = NULL;
+MQTTMessageBuffer *MQTTHandler::outBuffer = NULL;
 //TODO buffer pointers
 
 // Callbacks
 int MQTTHandler::cb_MessageArrived(void *context, char *topicName, int topicLength, MQTTAsync_message *message)
 {
 	std::cout << "Message arrived" << "\n";
+    string newtopic(topicName);
+    char* payloadptr;
+    payloadptr = (char*)message->payload;
+    //string newmessage((char*)message->payload);
+    string newmessage = string( payloadptr, message->payloadlen);
+    MQTTMessage inMessage(newtopic,newmessage);
+    if (!inBuffer->isFull())
+    	inBuffer->add(inMessage);
+    else
+    	std::cout << "Buffer full data lost!"<< "\n";
+
 
     //buffer population
     MQTTAsync_freeMessage(&message);
@@ -92,8 +105,46 @@ bool MQTTHandler::getConnectionStatus()
 {
 	return connectedStatic;
 }
-MQTTHandler::MQTTHandler() {
-	MQTTAsync client;
+void MQTTHandler::publishOutBuffer()
+{
+	while(true)
+	{
+		if(connectedStatic)
+		{
+			MQTTMessage message = outBuffer->remove();
+			publishMessage(message);
+		}
+	}
+}
+void MQTTHandler::publishMessage(MQTTMessage message)
+{
+
+	MQTTAsync_responseOptions opts = MQTTAsync_responseOptions_initializer;
+	MQTTAsync_message pubmsg = MQTTAsync_message_initializer;
+	int rc;
+
+	//printf("Message sending Topic: %s Message: %d\n",TOPIC,state);
+	//std::cout << "Message sending Topic: " << TOPIC << "Message:" << outMessage <<'\n';
+
+	//opts.onSuccess = onSend;
+	opts.context = client;
+	pubmsg.payload = (char*)message.getMessage().c_str();
+	pubmsg.payloadlen = strlen(message.getMessage().c_str());
+
+	pubmsg.qos = 1;
+	pubmsg.retained = 0;
+
+
+	if ((rc = MQTTAsync_sendMessage(client, message.getTopic().c_str(), &pubmsg, &opts)) != MQTTASYNC_SUCCESS)
+	{
+		printf("Failed to start sendMessage2, return code %d\n", rc);
+ 		//exit(-1);
+	}
+}
+MQTTHandler::MQTTHandler(MQTTMessageBuffer *inBufferPointer, MQTTMessageBuffer *outBufferPointer) {
+	inBuffer = inBufferPointer;
+	outBuffer = outBufferPointer;
+
 	MQTTAsync_connectOptions conn_opts = MQTTAsync_connectOptions_initializer;
 	MQTTAsync_message pubmsg = MQTTAsync_message_initializer;
 	MQTTAsync_token token;

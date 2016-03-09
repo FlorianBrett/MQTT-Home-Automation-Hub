@@ -12,7 +12,7 @@ extern "C" {
 #include "MQTTAsync.h"
 }
 #include "string.h"
-
+#include "MQTTMessageBuffer.h"
 class MQTTHandler {
 
 private:
@@ -25,10 +25,13 @@ private:
 	static void cb_SubscribeSuccess(void* context, MQTTAsync_successData* response);
 	static void cb_SubscribeFailure(void* context, MQTTAsync_failureData* response);
 	static int cb_MessageArrived(void *context, char *topicName, int topicLength, MQTTAsync_message *message);
-
-
+	static MQTTMessageBuffer *inBuffer;
+	static MQTTMessageBuffer *outBuffer;
+	MQTTAsync client;
+	void publishMessage(MQTTMessage message);
 public:
-	MQTTHandler();
+	MQTTHandler(MQTTMessageBuffer *inBufferPointer, MQTTMessageBuffer *outBufferPointer);
+	void publishOutBuffer();
 	bool getConnectionStatus();
 	virtual ~MQTTHandler(); // auto created research reason for it
 };

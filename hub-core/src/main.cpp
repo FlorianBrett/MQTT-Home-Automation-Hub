@@ -16,31 +16,20 @@
 #include "MQTTMessage.h"
 int main(int argc, char* argv[])
 {
-	MQTTMessageBuffer buffer;
+	MQTTMessageBuffer inBuffer;
+	MQTTMessageBuffer outBuffer;
 
-	MQTTMessage a{"topica","messagea"};
-	MQTTMessage b{"topicb","messageb"};
-	MQTTMessage c{"topicc","messagec"};
+	MQTTHandler mqttInstance{&inBuffer,&outBuffer};
+	std::thread PublishThread(&MQTTHandler::publishOutBuffer,&mqttInstance);
 
-	buffer.add(a);
-	buffer.add(b);
-	buffer.add(c);
-	//MQTTMessage m1,m2,m3;
-	MQTTMessage m1 = buffer.remove();
-	MQTTMessage m2 = buffer.remove();
-	MQTTMessage m3 = buffer.remove();
-
-
-	std::cout << "Buffer[1] Topic: " << m1.getTopic() << "Message:"<< m1.getMessage()<< "\n";
-	std::cout << "Buffer[2] Topic: " << m2.getTopic() << "Message:"<< m2.getMessage()<< "\n";
-	std::cout << "Buffer[3] Topic: " << m3.getTopic() << "Message:"<< m3.getMessage()<< "\n";
-
-	MQTTHandler test;
-	//test.getConnectionStatus();
+	std::cout << "Starting reflector\n";
 	while (true)
 	{
 
-		usleep(100000L);
+		MQTTMessage message = inBuffer.remove();
+		MQTTMessage message2{"/esp1/led1",message.getMessage()};
+		outBuffer.add(message2);
+		//usleep(100000L);
 		//std::cout << "connected:" << test.getConnectionStatus()<<"\n";
 	}
 
