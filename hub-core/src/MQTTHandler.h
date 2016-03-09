@@ -11,6 +11,7 @@
 extern "C" {
 #include "MQTTAsync.h"
 }
+#include "string.h"
 
 class MQTTHandler {
 
@@ -31,5 +32,4 @@ public:
 	bool getConnectionStatus();
 	virtual ~MQTTHandler(); // auto created research reason for it
 };
-
 #endif /* MQTTHANDLER_H_ */
