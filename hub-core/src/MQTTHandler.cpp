@@ -12,21 +12,14 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include <iostream>
+#include "DBHandler.h"
 //C Includes
 extern "C" {
 #include "MQTTAsync.h"
 }
 
-// TODO temporary defines in future will be stored in DB
-#define ADDRESS     "m10.cloudmqtt.com:10308"
-#define CLIENTID    "CClient"
-#define USERNAME     "avvppads"
-#define PASSWORD     "ORn9fPTI1hgq"
-#define TOPIC       "/esp1/led1"
+// TODO Remove topic define when rule system implemented.
 #define TOPIC2       "/esp1/switch1"
-#define PAYLOAD     "Hello World!"
-#define PAYLOAD1     "1"
-#define PAYLOAD0     "0"
 // CALLBACKS
 
 bool MQTTHandler::connectedStatic = false;
@@ -37,12 +30,11 @@ MQTTMessageBuffer *MQTTHandler::outBuffer = NULL;
 // Callbacks
 int MQTTHandler::cb_MessageArrived(void *context, char *topicName, int topicLength, MQTTAsync_message *message)
 {
-	std::cout << "Message arrived" << "\n";
     string newtopic(topicName);
     char* payloadptr;
     payloadptr = (char*)message->payload;
-    //string newmessage((char*)message->payload);
-    string newmessage = string( payloadptr, message->payloadlen);
+    string newmessage = string(payloadptr, message->payloadlen);
+    std::cout << "Message arrived: Topic: " << newtopic << " Message: "<< newmessage <<"\n";
     MQTTMessage inMessage(newtopic,newmessage);
     if (!inBuffer->isFull())
     	inBuffer->add(inMessage);
@@ -82,9 +74,9 @@ void MQTTHandler::cb_ConnectSuccess(void* context, MQTTAsync_successData* respon
 	opts.onFailure = cb_SubscribeFailure;
 	opts.context = client;
 
-	if ((rc = MQTTAsync_subscribe(client, TOPIC2, 1, &opts)) != MQTTASYNC_SUCCESS)
+	if ((rc = MQTTAsync_subscribe(client, "/#", 1, &opts)) != MQTTASYNC_SUCCESS)
 	{
-		//TODO is this error catching needed with as i havea call backs?
+		//TODO is this error catching needed with as i have call backs?
 		printf("Failed to start subscribe, return code %d\n", rc);
 		std::cout << "Subscribe Failure RC: " << rc << "\n";
 		//exit(-1);
@@ -118,13 +110,10 @@ void MQTTHandler::publishOutBuffer()
 }
 void MQTTHandler::publishMessage(MQTTMessage message)
 {
-
+	std::cout << "Message sent: Topic: " << message.getTopic() << " Message: "<< message.getMessage() <<"\n";
 	MQTTAsync_responseOptions opts = MQTTAsync_responseOptions_initializer;
 	MQTTAsync_message pubmsg = MQTTAsync_message_initializer;
 	int rc;
-
-	//printf("Message sending Topic: %s Message: %d\n",TOPIC,state);
-	//std::cout << "Message sending Topic: " << TOPIC << "Message:" << outMessage <<'\n';
 
 	//opts.onSuccess = onSend;
 	opts.context = client;
@@ -142,6 +131,18 @@ void MQTTHandler::publishMessage(MQTTMessage message)
 	}
 }
 MQTTHandler::MQTTHandler(MQTTMessageBuffer *inBufferPointer, MQTTMessageBuffer *outBufferPointer) {
+
+	DBHandler db;
+	const char* address = db.selectConfig("mqtt_address");
+
+	const char* clientID = db.selectConfig("mqtt_client_id");
+	const char* username = db.selectConfig("mqtt_username");
+	const char* password = db.selectConfig("mqtt_password");
+
+	//db.~DBHandler();
+	db.closeDB();
+
+
 	inBuffer = inBufferPointer;
 	outBuffer = outBufferPointer;
 
@@ -150,17 +151,19 @@ MQTTHandler::MQTTHandler(MQTTMessageBuffer *inBufferPointer, MQTTMessageBuffer *
 	MQTTAsync_token token;
 	int rc;
 
-	MQTTAsync_create(&client, ADDRESS, CLIENTID, MQTTCLIENT_PERSISTENCE_NONE, NULL);
+	MQTTAsync_create(&client, address, clientID , MQTTCLIENT_PERSISTENCE_NONE, NULL);
 	MQTTAsync_setCallbacks(client, NULL, &cb_ConnectionLost, *cb_MessageArrived, NULL);
 	conn_opts.context = client;
-	conn_opts.username = USERNAME;
-	conn_opts.password = PASSWORD;
+	conn_opts.username = username;
+	conn_opts.password = password;
+	//conn_opts.username = USERNAME;
+	//conn_opts.password = PASSWORD;
 	conn_opts.keepAliveInterval = 20;
 	conn_opts.cleansession = 1;
 
 	conn_opts.onSuccess = cb_ConnectSuccess;
 	conn_opts.onFailure = cb_ConnectFailure;
-
+	//std::cout << "Connecting to MQTT broker: " << std::string(address) << "\n";
 	if ((rc = MQTTAsync_connect(client, &conn_opts)) != MQTTASYNC_SUCCESS)
 	{
 		printf("Failed to start connect, return code %d\n", rc);

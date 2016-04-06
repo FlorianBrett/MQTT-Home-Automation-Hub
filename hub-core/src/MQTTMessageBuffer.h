@@ -15,11 +15,11 @@
 class MQTTMessageBuffer {
 private:
 	std::deque<MQTTMessage> inMessageBuffer;
-    const unsigned int bufferSize = 10;
+    unsigned int bufferSize;
     std::mutex mtx;
     std::condition_variable cv;
 public:
-    MQTTMessageBuffer();
+    MQTTMessageBuffer(int inBufferSize);
     void add(MQTTMessage inMessage);
     MQTTMessage remove();
     bool isFull();
