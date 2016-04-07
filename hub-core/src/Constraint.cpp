@@ -17,7 +17,7 @@ Constraint::Constraint(std::string constraintID) {
 	fieldID = constraint[1];
 	constraintOperator = constraint[2];
 	constraintValue = constraint[3];
-	std::cout <<"Constraint Loaded: " << fieldID << " " << constraintOperator << " "<< constraintValue << " "  <<"\n";
+	std::cout <<"Constraint Loaded: " << deviceID << "/" << fieldID << " " << constraintOperator << " "<< constraintValue << " "  <<"\n";
 }
 bool Constraint::resolveConstraint() {
 	bool resolution = false;
@@ -25,14 +25,67 @@ bool Constraint::resolveConstraint() {
 	std::string fieldValue = db.getStateValue2(deviceID,fieldID);
 	//db.~DBHandler();
 	db.closeDB();
-	if (fieldValue.compare(constraintValue) == 0)
+	if (constraintOperator.compare("=") == 0)
 	{
-		std::cout <<"Constraint Resolve: " << fieldID << " " << constraintOperator << " "<< constraintValue << " "  <<" is TRUE\n";
-		resolution = true;
+		//if (fieldValue.compare(constraintValue) == 0)
+		if (atoi(fieldValue.c_str()) == atoi(constraintValue.c_str()))
+		{
+			std::cout <<"Constraint Resolve(=): " << deviceID << "/" << fieldID << ": " << fieldValue << " " << constraintOperator << " "<< constraintValue << " "  <<" is TRUE\n";
+			resolution = true;
+		}
+		else
+			std::cout <<"Constraint Resolve(=): " << deviceID << "/" << fieldID << ": " << fieldValue << " " << constraintOperator << " "<< constraintValue << " "  <<" is FALSE\n";
 	}
-	else
-		std::cout <<"Constraint Resolve: " << fieldID << " " << constraintOperator << " "<< constraintValue << " "  <<" is FALSE\n";
-
+	else if (constraintOperator.compare("<") == 0)
+	{
+		if (atoi(fieldValue.c_str()) < atoi(constraintValue.c_str()))
+		{
+			std::cout <<"Constraint Resolve(<): " << deviceID << "/" << fieldID << ": " << fieldValue << " " << constraintOperator << " "<< constraintValue << " "  <<" is TRUE\n";
+			resolution = true;
+		}
+		else
+			std::cout <<"Constraint Resolve(<): " << deviceID << "/" << fieldID << ": " << fieldValue << " " << constraintOperator << " "<< constraintValue << " "  <<" is FALSE\n";
+	}
+	else if (constraintOperator.compare(">") == 0)
+	{
+		if (atoi(fieldValue.c_str()) > atoi(constraintValue.c_str()))
+		{
+			std::cout <<"Constraint Resolve(>): " << deviceID << "/" << fieldID << ": " << fieldValue << " " << constraintOperator << " "<< constraintValue << " "  <<" is TRUE\n";
+			resolution = true;
+		}
+		else
+			std::cout <<"Constraint Resolve(>): " << deviceID << "/" << fieldID << ": " << fieldValue << " " << constraintOperator << " "<< constraintValue << " "  <<" is FALSE\n";
+	}
+	else if (constraintOperator.compare("<=") == 0)
+	{
+		if (atoi(fieldValue.c_str()) <= atoi(constraintValue.c_str()))
+		{
+			std::cout <<"Constraint Resolve(<=): " << deviceID << "/" << fieldID << ": " << fieldValue << " " << constraintOperator << " "<< constraintValue << " "  <<" is TRUE\n";
+			resolution = true;
+		}
+		else
+			std::cout <<"Constraint Resolve(<=): " << deviceID << "/" << fieldID << ": " << fieldValue << " " << constraintOperator << " "<< constraintValue << " "  <<" is FALSE\n";
+	}
+	else if (constraintOperator.compare(">=") == 0)
+	{
+		if (atoi(fieldValue.c_str()) >= atoi(constraintValue.c_str()))
+		{
+			std::cout <<"Constraint Resolve(>=): " << deviceID << "/" << fieldID << ": " << fieldValue << " " << constraintOperator << " "<< constraintValue << " "  <<" is TRUE\n";
+			resolution = true;
+		}
+		else
+			std::cout <<"Constraint Resolve(>=): " << deviceID << "/" << fieldID << ": " << fieldValue << " " << constraintOperator << " "<< constraintValue << " "  <<" is FALSE\n";
+	}
+	else if (constraintOperator.compare("!=") == 0)
+	{
+		if (atoi(fieldValue.c_str()) != atoi(constraintValue.c_str()))
+		{
+			std::cout <<"Constraint Resolve(!=): " << deviceID << "/" << fieldID << ": " << fieldValue << " " << constraintOperator << " "<< constraintValue << " "  <<" is TRUE\n";
+			resolution = true;
+		}
+		else
+			std::cout <<"Constraint Resolve(!=): " << deviceID << "/" << fieldID << ": " << fieldValue << " " << constraintOperator << " "<< constraintValue << " "  <<" is FALSE\n";
+	}
 	return resolution;
 }
 Constraint::~Constraint() {
