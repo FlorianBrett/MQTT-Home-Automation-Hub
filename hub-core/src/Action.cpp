@@ -4,7 +4,7 @@
  *  Created on: 16 Mar 2016
  *      Author: flo
  */
-
+#include "DBHandler.h"
 #include "Action.h"
 #include "MQTTMessageBuffer.h"
 #include <string>
@@ -23,10 +23,44 @@ Action::Action(std::string actionID) {
 }
 void Action::commitAction(MQTTMessageBuffer *outBufferPointer)
 {
+	DBHandler db;
+	std::string fieldValue = db.getStateValue2(deviceID,fieldID);
+	db.closeDB();
 	std::string topic = "/" + deviceID + "/" + fieldID;
-	MQTTMessage outMessage{topic,actionValue};
+	std::string message;
+	if (actionOperator.compare("=") == 0)
+	{
+		message = actionValue;
+		std::cout <<"Action(=): " << message <<"\n
+	}
+	else if (actionOperator.compare("+") == 0)
+	{
+		int newValue = atoi(fieldValue.c_str()) + atoi(actionValue.c_str());
+		message = std::to_string(newValue);
+		std::cout <<"Action(+): " << fieldValue << " " << actionOperator << " " << actionValue << " = " << message <<"\n";
+	}
+	else if (actionOperator.compare("-") == 0)
+	{
+		int newValue = atoi(fieldValue.c_str()) - atoi(actionValue.c_str());
+		message = std::to_string(newValue);
+		std::cout <<"Action(-): " << fieldValue << " " << actionOperator << " " << actionValue << " = " << message <<"\n";
+	}
+	else if (actionOperator.compare("toggle") == 0)
+	{
+		std::cout <<"Action(toggle): ";
+		if (atoi(fieldValue.c_str()) == 1)
+		{
+			message = "0";
+		}
+		else
+		{
+			message = "1";
+		}
+		std::cout <<"Toggle from: " << fieldValue << " to " << message << "\n";
+	}
+	MQTTMessage outMessage{topic,message};
 	outBufferPointer->add(outMessage);
-	std::cout <<"Action Commited: " << topic << " " << actionOperator << " "<< actionValue << " "  <<"\n";
+	std::cout <<"Action Commited: " << deviceID << "/" << fieldID << ": " << actionOperator << " "<< actionValue << " "  <<"\n";
 }
 
 Action::~Action() {
