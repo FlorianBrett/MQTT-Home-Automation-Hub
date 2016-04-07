@@ -15,8 +15,8 @@ Action::Action(std::string actionID) {
 	std::vector<std::string> action = db.getAction(actionID);
 	//db.~DBHandler();
 	db.closeDB();
-	fieldID = action[0];
-	deviceID = action[1];
+	deviceID = action[0];
+	fieldID = action[1];
 	actionOperator = action[2];
 	actionValue = action[3];
 	std::cout <<"Action Loaded: " << fieldID << " " << actionOperator << " "<< actionValue << " "  <<"\n";

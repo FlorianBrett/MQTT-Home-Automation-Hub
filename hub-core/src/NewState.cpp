@@ -28,7 +28,6 @@ bool NewState::checkStateChange() {
 		std::cout <<"State has not Changed" <<"\n";
 	//db.~DBHandler();
 	db.closeDB();
-	std::cout <<"seg check 1 \n";
 	return stateChanged;
 }
 NewState::NewState(MQTTMessage inMessage,MQTTMessageBuffer *outBufferPointer) {
@@ -43,7 +42,6 @@ NewState::NewState(MQTTMessage inMessage,MQTTMessageBuffer *outBufferPointer) {
 
 	if (checkStateChange() == true)
 	{
-		std::cout <<"seg check 2\n";
 		DBHandler db;
 		db.setStateValue2(device,field,value);
 		std::vector<std::string> ruleIDs = db.getRuleIDs(device,field);
@@ -69,7 +67,7 @@ NewState::NewState(MQTTMessage inMessage,MQTTMessageBuffer *outBufferPointer) {
 			std::cout <<"No rules found\n";
 		}
 	}
-
+	std::cout <<"New State Finished \n\n";
 
 	// TODO Check matching rules
 	// TODO Create rules

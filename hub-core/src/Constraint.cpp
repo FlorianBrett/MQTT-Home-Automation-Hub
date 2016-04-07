@@ -13,15 +13,16 @@ Constraint::Constraint(std::string constraintID) {
 	std::vector<std::string> constraint = db.getConstraint(constraintID);
 	//db.~DBHandler();
 	db.closeDB();
-	fieldID = constraint[0];
-	constraintOperator = constraint[1];
-	constraintValue = constraint[2];
+	deviceID = constraint[0];
+	fieldID = constraint[1];
+	constraintOperator = constraint[2];
+	constraintValue = constraint[3];
 	std::cout <<"Constraint Loaded: " << fieldID << " " << constraintOperator << " "<< constraintValue << " "  <<"\n";
 }
 bool Constraint::resolveConstraint() {
 	bool resolution = false;
 	DBHandler db;
-	std::string fieldValue = db.getStateValue2("esp1",fieldID);
+	std::string fieldValue = db.getStateValue2(deviceID,fieldID);
 	//db.~DBHandler();
 	db.closeDB();
 	if (fieldValue.compare(constraintValue) == 0)

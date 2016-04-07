@@ -43,7 +43,7 @@ char* DBHandler::selectConfig(std::string name)
 	char* result;
 	sqlite3_stmt *sqlStatement;
 	sql = "SELECT * FROM CONFIG WHERE name = '" + name + "';";
-	std::cout <<"SQL Statement: " << sql << '\n';
+	//std::cout <<"SQL Statement: " << sql << '\n';
 	if(sqlite3_prepare_v2(db, sql.c_str(), -1, &sqlStatement, 0) == SQLITE_OK)
 	{
 		if(sqlite3_step(sqlStatement) == SQLITE_ROW)
@@ -64,7 +64,7 @@ char* DBHandler::getStateValue(std::string device,std::string field)
 	char* result;
 	sqlite3_stmt *sqlStatement;
 	sql = "SELECT * FROM field WHERE device_id = '" + device + "' AND field_id = '" + field + "';";
-	std::cout <<"SQL Statement: " << sql << '\n';
+	//std::cout <<"SQL Statement: " << sql << '\n';
 	if(sqlite3_prepare_v2(db, sql.c_str(), -1, &sqlStatement, 0) == SQLITE_OK)
 	{
 		if(sqlite3_step(sqlStatement) == SQLITE_ROW)
@@ -88,7 +88,7 @@ std::string DBHandler::getStateValue2(std::string device,std::string field)
 	char* result;
 	sqlite3_stmt *sqlStatement;
 	sql = "SELECT * FROM field WHERE device_id = '" + device + "' AND field_id = '" + field + "';";
-	std::cout <<"SQL Statement: " << sql << '\n';
+	//std::cout <<"SQL Statement: " << sql << '\n';
 	if(sqlite3_prepare_v2(db, sql.c_str(), -1, &sqlStatement, 0) == SQLITE_OK)
 	{
 		if(sqlite3_step(sqlStatement) == SQLITE_ROW)
@@ -113,7 +113,7 @@ void DBHandler::setStateValue(std::string device,std::string field,std::string v
 	char* result;
 	sqlite3_stmt *sqlStatement;
 	sql = "UPDATE field SET field_value='" + value + "' WHERE device_id ='" + device + "' AND field_id = '" + field + "';";
-	std::cout <<"SQL Statement: " << sql << '\n';
+	//std::cout <<"SQL Statement: " << sql << '\n';
 
 	char *zErrMsg = 0;
 	if (sqlite3_exec(db, sql.c_str(), &cb_Output, 0, &zErrMsg) != SQLITE_OK)
@@ -133,11 +133,12 @@ void DBHandler::setStateValue2(std::string device,std::string field,std::string 
 	char* result;
 	sqlite3_stmt *sqlStatement;
 	sql = "UPDATE field SET field_value='" + value + "' WHERE device_id='" + device + "' AND field_id='" + field + "';";
-	std::cout <<"SQL Statement: " << sql << '\n';
+	//std::cout <<"SQL Statement: " << sql << '\n';
 
 	if(sqlite3_prepare_v2(db, sql.c_str(), -1, &sqlStatement, 0) == SQLITE_OK)
 	{
-		std::cout <<"sqlite UPDATE COMPLETE :" << sqlite3_step(sqlStatement) <<'\n';
+		sqlite3_step(sqlStatement);
+		//std::cout <<"sqlite UPDATE COMPLETE :" << sqlite3_step(sqlStatement) <<'\n';
 	}
 	else
 		std::cout <<"sqlite Prepare fail" << '\n';
@@ -150,7 +151,7 @@ std::vector<std::string> DBHandler::getRuleIDs(std::string device,std::string fi
 	std::vector<std::string> results;
 		sqlite3_stmt *sqlStatement;
 		sql = "SELECT rule_id FROM rule_constraint WHERE field_id ='" + field + "';";
-		std::cout <<"SQL Statement: " << sql << '\n';
+		//std::cout <<"SQL Statement: " << sql << '\n';
 		if(sqlite3_prepare_v2(db, sql.c_str(), -1, &sqlStatement, 0) == SQLITE_OK)
 		{
 			while(sqlite3_step(sqlStatement) == SQLITE_ROW)
@@ -160,7 +161,7 @@ std::vector<std::string> DBHandler::getRuleIDs(std::string device,std::string fi
 		}
 		else
 			std::cout <<"sqlite Prepare fail" << '\n';
-		std::cout << "Results: ";
+		std::cout << "RuleID Results: ";
 		for(std::vector<std::string>::iterator it = results.begin(); it != results.end(); ++it) {
 		    std::cout << "[" << *it << "] ";
 		}
@@ -174,7 +175,7 @@ std::vector<std::string> DBHandler::getConstraintIDs(std::string ruleID)
 	std::vector<std::string> results;
 	sqlite3_stmt *sqlStatement;
 	sql = "SELECT constraint_id FROM rule_constraint WHERE rule_id=" + ruleID + ";";
-	std::cout <<"SQL Statement: " << sql << '\n';
+	//std::cout <<"SQL Statement: " << sql << '\n';
 	if(sqlite3_prepare_v2(db, sql.c_str(), -1, &sqlStatement, 0) == SQLITE_OK)
 	{
 		while(sqlite3_step(sqlStatement) == SQLITE_ROW)
@@ -184,7 +185,7 @@ std::vector<std::string> DBHandler::getConstraintIDs(std::string ruleID)
 	}
 	else
 		std::cout <<"sqlite Prepare fail" << '\n';
-	std::cout << "Results: ";
+	std::cout << "ConstraintID Results: ";
 	for(std::vector<std::string>::iterator it = results.begin(); it != results.end(); ++it) {
 	    std::cout << "[" << *it << "] ";
 	}
@@ -197,8 +198,8 @@ std::vector<std::string> DBHandler::getConstraint(std::string constraintID)
 	std::string sql;
 	std::vector<std::string> results;
 	sqlite3_stmt *sqlStatement;
-	sql = "SELECT field_id, constraint_operator, constraint_value FROM rule_constraint WHERE constraint_id=" + constraintID + ";";
-	std::cout <<"SQL Statement: " << sql << '\n';
+	sql = "SELECT field.device_id, rule_constraint.field_id, rule_constraint.constraint_operator, rule_constraint.constraint_value FROM rule_constraint INNER JOIN field ON field.field_id=rule_constraint.field_id WHERE constraint_id=" + constraintID + ";";
+	//std::cout <<"SQL Statement: " << sql << '\n';
 	if(sqlite3_prepare_v2(db, sql.c_str(), -1, &sqlStatement, 0) == SQLITE_OK)
 	{
 		if(sqlite3_step(sqlStatement) == SQLITE_ROW)
@@ -206,11 +207,12 @@ std::vector<std::string> DBHandler::getConstraint(std::string constraintID)
 			results.push_back(std::string((char*)sqlite3_column_text(sqlStatement, 0)));
 			results.push_back(std::string((char*)sqlite3_column_text(sqlStatement, 1)));
 			results.push_back(std::string((char*)sqlite3_column_text(sqlStatement, 2)));
+			results.push_back(std::string((char*)sqlite3_column_text(sqlStatement, 3)));
 		}
 	}
 	else
 		std::cout <<"sqlite Prepare fail" << '\n';
-	std::cout << "Results: ";
+	std::cout << "Constraint Results: ";
 	for(std::vector<std::string>::iterator it = results.begin(); it != results.end(); ++it) {
 	    std::cout << "[" << *it << "] ";
 	}
@@ -224,7 +226,7 @@ std::vector<std::string> DBHandler::getActionIDs(std::string ruleID)
 	std::vector<std::string> results;
 	sqlite3_stmt *sqlStatement;
 	sql = "SELECT action_id FROM rule_action WHERE rule_id=" + ruleID + ";";
-	std::cout <<"SQL Statement: " << sql << '\n';
+	//std::cout <<"SQL Statement: " << sql << '\n';
 	if(sqlite3_prepare_v2(db, sql.c_str(), -1, &sqlStatement, 0) == SQLITE_OK)
 	{
 		while(sqlite3_step(sqlStatement) == SQLITE_ROW)
@@ -234,7 +236,7 @@ std::vector<std::string> DBHandler::getActionIDs(std::string ruleID)
 	}
 	else
 		std::cout <<"sqlite Prepare fail" << '\n';
-	std::cout << "Results: ";
+	std::cout << "ActionID Results: ";
 	for(std::vector<std::string>::iterator it = results.begin(); it != results.end(); ++it) {
 	    std::cout << "[" << *it << "] ";
 	}
@@ -247,8 +249,8 @@ std::vector<std::string> DBHandler::getAction(std::string actionID)
 	std::string sql;
 	std::vector<std::string> results;
 	sqlite3_stmt *sqlStatement;
-	sql = "SELECT rule_action.field_id, field.device_id, rule_action.action_operator, rule_action.action_value FROM rule_action INNER JOIN field ON field.field_id=rule_action.field_id WHERE action_id=" + actionID + ";";
-	std::cout <<"SQL Statement: " << sql << '\n';
+	sql = "SELECT field.device_id, rule_action.field_id, rule_action.action_operator, rule_action.action_value FROM rule_action INNER JOIN field ON field.field_id=rule_action.field_id WHERE action_id=" + actionID + ";";
+	//std::cout <<"SQL Statement: " << sql << '\n';
 	if(sqlite3_prepare_v2(db, sql.c_str(), -1, &sqlStatement, 0) == SQLITE_OK)
 	{
 		if(sqlite3_step(sqlStatement) == SQLITE_ROW)
@@ -261,7 +263,7 @@ std::vector<std::string> DBHandler::getAction(std::string actionID)
 	}
 	else
 		std::cout <<"sqlite Prepare fail" << '\n';
-	std::cout << "Results: ";
+	std::cout << "Action Results: ";
 	for(std::vector<std::string>::iterator it = results.begin(); it != results.end(); ++it) {
 	    std::cout << "[" << *it << "] ";
 	}
@@ -272,7 +274,7 @@ std::vector<std::string> DBHandler::getAction(std::string actionID)
 void DBHandler::closeDB()
 {
 	sqlite3_close(db);
-	std::cout <<"Closed DB connection " << '\n';
+	//std::cout <<"Closed DB connection " << '\n';
 }
 
 
@@ -284,7 +286,7 @@ DBHandler::DBHandler() {
 	   if( rc ){
 	      fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
 	   }else{
-	      fprintf(stdout, "Opened database successfully\n");
+	      //fprintf(stdout, "Opened database successfully\n");
 	   }
 }
 

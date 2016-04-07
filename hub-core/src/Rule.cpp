@@ -15,7 +15,7 @@
 Rule::Rule(std::string ruleID) {
 	DBHandler db;
 	std::vector<std::string> constraintIDs = db.getConstraintIDs(ruleID);
-	std::vector<std::string> actionIDs = db.getConstraintIDs(ruleID);
+	std::vector<std::string> actionIDs = db.getActionIDs(ruleID);
 	//db.~DBHandler();
 	db.closeDB();
 	for(std::vector<std::string>::iterator it = constraintIDs.begin(); it != constraintIDs.end(); ++it) {

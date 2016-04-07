@@ -10,6 +10,7 @@
 #include <string>
 class Constraint {
 private:
+	std::string deviceID;
 	std::string fieldID;
 	std::string constraintOperator;
 	std::string constraintValue;
