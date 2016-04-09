@@ -18,9 +18,6 @@ extern "C" {
 #include "MQTTAsync.h"
 }
 
-// TODO Remove topic define when rule system implemented.
-#define TOPIC2       "/esp1/switch1"
-// CALLBACKS
 
 bool MQTTHandler::connectedStatic = false;
 MQTTMessageBuffer *MQTTHandler::inBuffer = NULL;
@@ -34,7 +31,7 @@ int MQTTHandler::cb_MessageArrived(void *context, char *topicName, int topicLeng
     char* payloadptr;
     payloadptr = (char*)message->payload;
     string newmessage = string(payloadptr, message->payloadlen);
-    std::cout << "Message arrived: Topic: " << newtopic << " Message: "<< newmessage <<"\n";
+    //std::cout << "Message arrived: Topic: " << newtopic << " Message: "<< newmessage <<"\n";
     MQTTMessage inMessage(newtopic,newmessage);
     if (!inBuffer->isFull())
     	inBuffer->add(inMessage);
@@ -105,12 +102,13 @@ void MQTTHandler::publishOutBuffer()
 		{
 			MQTTMessage message = outBuffer->remove();
 			publishMessage(message);
+
 		}
 	}
 }
 void MQTTHandler::publishMessage(MQTTMessage message)
 {
-	std::cout << "Message sent: Topic: " << message.getTopic() << " Message: "<< message.getMessage() <<"\n";
+	//std::cout << "Message sent: Topic: " << message.getTopic() << " Message: "<< message.getMessage() <<"\n";
 	MQTTAsync_responseOptions opts = MQTTAsync_responseOptions_initializer;
 	MQTTAsync_message pubmsg = MQTTAsync_message_initializer;
 	int rc;

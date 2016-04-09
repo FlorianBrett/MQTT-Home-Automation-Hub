@@ -27,9 +27,21 @@ void DBHandler::sqlExec(char* inSQL)
 {
 	char *zErrMsg = 0;
 	int  rc;
+	rc = sqlite3_exec(db, inSQL, &cb_Output, 0, &zErrMsg);
+	if( rc != SQLITE_OK ){
+	fprintf(stderr, "SQL error: %s\n", zErrMsg);
+	   sqlite3_free(zErrMsg);
+	}else{
+	   fprintf(stdout, "SQL Executed successfully\n");
+	}
+}
+void DBHandler::sqlExec(std::string sql)
+{
+	char *zErrMsg = 0;
+	int  rc;
 	//inSQL = "SELECT * from COMPANY";
 	//TODO 4th argument can be used for a passback
-	rc = sqlite3_exec(db, inSQL, &cb_Output, 0, &zErrMsg);
+	rc = sqlite3_exec(db, sql.c_str(), &cb_Output, 0, &zErrMsg);
 	if( rc != SQLITE_OK ){
 	fprintf(stderr, "SQL error: %s\n", zErrMsg);
 	   sqlite3_free(zErrMsg);
@@ -103,7 +115,7 @@ std::string DBHandler::getStateValue2(std::string device,std::string field)
 		result = "NULL";
 	}
 	std::string returnResult = std::string(result);
-	std::cout <<"State loaded for " << device << "/" << field <<" : " << returnResult << '\n';
+	//std::cout <<"State loaded for " << device << "/" << field <<" : " << returnResult << '\n';
 	sqlite3_finalize(sqlStatement);
 	return returnResult;
 }
@@ -123,7 +135,7 @@ void DBHandler::setStateValue(std::string device,std::string field,std::string v
 	}
 	else
 	{
-		std::cout <<"State updated for " << device << "/" << field <<" : " << value << '\n';
+		//std::cout <<"State updated for " << device << "/" << field <<" : " << value << '\n';
 	}
 	sqlite3_finalize(sqlStatement);
 }
@@ -143,14 +155,14 @@ void DBHandler::setStateValue2(std::string device,std::string field,std::string 
 	else
 		std::cout <<"sqlite Prepare fail" << '\n';
 	sqlite3_finalize(sqlStatement);
-	std::cout <<"State updated for " << device << "/" << field <<" : " << value << '\n';
+	//std::cout <<"State updated for " << device << "/" << field <<" : " << value << '\n';
 }
 std::vector<std::string> DBHandler::getRuleIDs(std::string device,std::string field)
 {
 	std::string sql;
 	std::vector<std::string> results;
 		sqlite3_stmt *sqlStatement;
-		sql = "SELECT rule_id FROM rule_constraint WHERE field_id ='" + field + "';";
+		sql = "SELECT DISTINCT rule_id FROM rule_constraint WHERE field_id ='" + field + "';";
 		//std::cout <<"SQL Statement: " << sql << '\n';
 		if(sqlite3_prepare_v2(db, sql.c_str(), -1, &sqlStatement, 0) == SQLITE_OK)
 		{
@@ -161,11 +173,6 @@ std::vector<std::string> DBHandler::getRuleIDs(std::string device,std::string fi
 		}
 		else
 			std::cout <<"sqlite Prepare fail" << '\n';
-		std::cout << "RuleID Results: ";
-		for(std::vector<std::string>::iterator it = results.begin(); it != results.end(); ++it) {
-		    std::cout << "[" << *it << "] ";
-		}
-		std::cout << "\n";
 		sqlite3_finalize(sqlStatement);
 		return results;
 }
@@ -185,11 +192,6 @@ std::vector<std::string> DBHandler::getConstraintIDs(std::string ruleID)
 	}
 	else
 		std::cout <<"sqlite Prepare fail" << '\n';
-	std::cout << "ConstraintID Results: ";
-	for(std::vector<std::string>::iterator it = results.begin(); it != results.end(); ++it) {
-	    std::cout << "[" << *it << "] ";
-	}
-	std::cout << "\n";
 	sqlite3_finalize(sqlStatement);
 	return results;
 }
@@ -212,11 +214,6 @@ std::vector<std::string> DBHandler::getConstraint(std::string constraintID)
 	}
 	else
 		std::cout <<"sqlite Prepare fail" << '\n';
-	std::cout << "Constraint Results: ";
-	for(std::vector<std::string>::iterator it = results.begin(); it != results.end(); ++it) {
-	    std::cout << "[" << *it << "] ";
-	}
-	std::cout << "\n";
 	sqlite3_finalize(sqlStatement);
 	return results;
 }
@@ -236,11 +233,6 @@ std::vector<std::string> DBHandler::getActionIDs(std::string ruleID)
 	}
 	else
 		std::cout <<"sqlite Prepare fail" << '\n';
-	std::cout << "ActionID Results: ";
-	for(std::vector<std::string>::iterator it = results.begin(); it != results.end(); ++it) {
-	    std::cout << "[" << *it << "] ";
-	}
-	std::cout << "\n";
 	sqlite3_finalize(sqlStatement);
 	return results;
 }
@@ -263,13 +255,60 @@ std::vector<std::string> DBHandler::getAction(std::string actionID)
 	}
 	else
 		std::cout <<"sqlite Prepare fail" << '\n';
-	std::cout << "Action Results: ";
-	for(std::vector<std::string>::iterator it = results.begin(); it != results.end(); ++it) {
-	    std::cout << "[" << *it << "] ";
-	}
-	std::cout << "\n";
+
 	sqlite3_finalize(sqlStatement);
 	return results;
+}
+std::vector<std::array<int,2>> DBHandler::getTimerRules()
+{
+	std::string sql;
+	std::vector<std::array<int,2>> results;
+		sqlite3_stmt *sqlStatement;
+		sql = "SELECT rule_id, constraint_value FROM rule_constraint WHERE constraint_operator = 'time>' OR constraint_operator = 'time<' ORDER BY constraint_value DESC;";
+		//std::cout <<"SQL Statement: " << sql << '\n';
+		if(sqlite3_prepare_v2(db, sql.c_str(), -1, &sqlStatement, 0) == SQLITE_OK)
+		{
+			while(sqlite3_step(sqlStatement) == SQLITE_ROW)
+			{
+				int ruleID = sqlite3_column_int(sqlStatement, 0);
+				int constraintValue = sqlite3_column_int(sqlStatement, 1);
+				results.push_back(std::array<int,2>{ruleID,constraintValue});
+			}
+		}
+		else
+			std::cout <<"sqlite Prepare fail" << '\n';
+		std::cout << "TimerRuleID Results: ";
+		for(std::vector<std::array<int,2>>::iterator it = results.begin(); it != results.end(); ++it) {
+		    std::cout << "[" << it->operator [](0) << "/" << it->operator [](1) << "] ";
+		}
+		std::cout << "check\n";
+		sqlite3_finalize(sqlStatement);
+		return results;
+}
+std::vector<std::array<int,2>> DBHandler::getTimerRules(int startTime, int finishTime)
+{
+	std::string sql;
+	std::vector<std::array<int,2>> results;
+		sqlite3_stmt *sqlStatement;
+		sql = "SELECT rule_id, constraint_value FROM rule_constraint WHERE (constraint_operator = 'time>' OR constraint_operator = 'time<') AND constraint_value >= " + std::to_string(startTime) + " AND constraint_value <= " + std::to_string(finishTime) + " ORDER BY constraint_value DESC;";
+		//std::cout <<"Time Rule SQL Statement: " << sql << '\n';
+		if(sqlite3_prepare_v2(db, sql.c_str(), -1, &sqlStatement, 0) == SQLITE_OK)
+		{
+			while(sqlite3_step(sqlStatement) == SQLITE_ROW)
+			{
+				int ruleID = sqlite3_column_int(sqlStatement, 0);
+				int constraintValue = sqlite3_column_int(sqlStatement, 1);
+				results.push_back(std::array<int,2>{ruleID,constraintValue});
+			}
+		}
+		else
+			std::cout <<"sqlite Prepare fail" << '\n';
+		//std::cout << "TimerRuleID Results: ";
+		for(std::vector<std::array<int,2>>::iterator it = results.begin(); it != results.end(); ++it) {
+		    std::cout << "[" << it->operator [](0) << "/" << it->operator [](1) << "] ";
+		}
+		sqlite3_finalize(sqlStatement);
+		return results;
 }
 void DBHandler::closeDB()
 {

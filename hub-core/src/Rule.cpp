@@ -11,12 +11,14 @@
 #include "DBHandler.h"
 #include <string>
 #include <vector>
-
-Rule::Rule(std::string ruleID) {
+#include <iostream>
+Rule::Rule(std::string inRuleID) {
+	ruleID=inRuleID;
+}
+void Rule::loadRule() {
 	DBHandler db;
 	std::vector<std::string> constraintIDs = db.getConstraintIDs(ruleID);
 	std::vector<std::string> actionIDs = db.getActionIDs(ruleID);
-	//db.~DBHandler();
 	db.closeDB();
 	for(std::vector<std::string>::iterator it = constraintIDs.begin(); it != constraintIDs.end(); ++it) {
 		Constraint tempConstraint(*it);
@@ -35,6 +37,10 @@ bool Rule::resolveRule() {
 			resolution = false;
 		}
 	}
+	if (resolution == true)
+		std::cout << "Rule" << ruleID  << ": resolved TRUE \n";
+	else
+		std::cout << "Rule" << ruleID  << ": resolved FALSE \n";
 	return resolution;
 }
 void Rule::commitActions(MQTTMessageBuffer *outBufferPointer) {

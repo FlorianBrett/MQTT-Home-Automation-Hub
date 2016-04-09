@@ -11,6 +11,7 @@
 #include "sqlite3.h"
 #include <string>
 #include <queue>
+#include <array>
 class DBHandler {
 private:
 	sqlite3 *db;
@@ -19,6 +20,7 @@ public:
 	DBHandler();
 	void closeDB();
 	void sqlExec(char* inSQL);
+	void sqlExec(std::string sql);
 	char* selectConfig(std::string name);
 	char* getStateValue(std::string device,std::string field);
 	std::string getStateValue2(std::string device,std::string field);
@@ -29,6 +31,8 @@ public:
 	std::vector<std::string> getConstraint(std::string constraintID);
 	std::vector<std::string> getActionIDs(std::string ruleID);
 	std::vector<std::string> getAction(std::string actiontID);
+	std::vector<std::array<int,2>> getTimerRules();
+	std::vector<std::array<int,2>> getTimerRules(int startTime, int finishTime);
 	virtual ~DBHandler();
 };
 

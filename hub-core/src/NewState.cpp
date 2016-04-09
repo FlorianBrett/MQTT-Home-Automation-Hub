@@ -21,11 +21,11 @@ bool NewState::checkStateChange() {
 	std::cout <<"Comparing: '" << value << "' AND '" << originalValue << "'" <<"\n";
 	if (value.compare(originalValue) != 0)
 	{
-		std::cout <<"State Changed" <<"\n";
+		std::cout <<"State Changed. Updating DB." <<"\n";
 		stateChanged = true;
 	}
 	else
-		std::cout <<"State has not Changed" <<"\n";
+		std::cout <<"State not Changed" <<"\n";
 	//db.~DBHandler();
 	db.closeDB();
 	return stateChanged;
@@ -38,7 +38,7 @@ NewState::NewState(MQTTMessage inMessage,MQTTMessageBuffer *outBufferPointer) {
 	topic.erase(0, pos + 1);
 	field = topic;
 	value = inMessage.getMessage();
-	std::cout <<"New State: " << device << " AND " << field << " AND " << value <<"\n";
+	std::cout <<"\nNew State: " << device << "/" << field << "=" << value <<"\n";
 
 	if (checkStateChange() == true)
 	{
@@ -49,25 +49,27 @@ NewState::NewState(MQTTMessage inMessage,MQTTMessageBuffer *outBufferPointer) {
 		db.closeDB();
 		if(ruleIDs.size() > 0)
 		{
-			std::cout <<"Rules found\n";
+			std::cout <<"Rules found for "<< device << "/" << field << ": ";
 			for(std::vector<std::string>::iterator it = ruleIDs.begin(); it != ruleIDs.end(); ++it)
 			{
+				std::cout << *it << " ";
 				Rule tempRule(*it);
+
 				rules.push_back(tempRule);
 			}
-
+			std::cout << "\n";
 			for(std::vector<Rule>::iterator it = rules.begin(); it != rules.end(); ++it)
 			{
+				it->loadRule();
 				if(it->resolveRule() == true)
 					it->commitActions(outBufferPointer);
 			}
 		}
 		else
 		{
-			std::cout <<"No rules found\n";
+			std::cout <<"No rules found for "<< device << "/" << field << "\n";
 		}
 	}
-	std::cout <<"New State Finished \n\n";
 
 	// TODO Check matching rules
 	// TODO Create rules

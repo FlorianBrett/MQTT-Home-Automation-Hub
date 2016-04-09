@@ -13,13 +13,11 @@
 Action::Action(std::string actionID) {
 	DBHandler db;
 	std::vector<std::string> action = db.getAction(actionID);
-	//db.~DBHandler();
 	db.closeDB();
 	deviceID = action[0];
 	fieldID = action[1];
 	actionOperator = action[2];
 	actionValue = action[3];
-	std::cout <<"Action Loaded: " << fieldID << " " << actionOperator << " "<< actionValue << " "  <<"\n";
 }
 void Action::commitAction(MQTTMessageBuffer *outBufferPointer)
 {
@@ -31,36 +29,26 @@ void Action::commitAction(MQTTMessageBuffer *outBufferPointer)
 	if (actionOperator.compare("=") == 0)
 	{
 		message = actionValue;
-		std::cout <<"Action(=): " << message <<"\n
 	}
 	else if (actionOperator.compare("+") == 0)
 	{
 		int newValue = atoi(fieldValue.c_str()) + atoi(actionValue.c_str());
 		message = std::to_string(newValue);
-		std::cout <<"Action(+): " << fieldValue << " " << actionOperator << " " << actionValue << " = " << message <<"\n";
 	}
 	else if (actionOperator.compare("-") == 0)
 	{
 		int newValue = atoi(fieldValue.c_str()) - atoi(actionValue.c_str());
 		message = std::to_string(newValue);
-		std::cout <<"Action(-): " << fieldValue << " " << actionOperator << " " << actionValue << " = " << message <<"\n";
 	}
 	else if (actionOperator.compare("toggle") == 0)
 	{
-		std::cout <<"Action(toggle): ";
 		if (atoi(fieldValue.c_str()) == 1)
-		{
 			message = "0";
-		}
 		else
-		{
 			message = "1";
-		}
-		std::cout <<"Toggle from: " << fieldValue << " to " << message << "\n";
 	}
 	MQTTMessage outMessage{topic,message};
 	outBufferPointer->add(outMessage);
-	std::cout <<"Action Commited: " << deviceID << "/" << fieldID << ": " << actionOperator << " "<< actionValue << " "  <<"\n";
 }
 
 Action::~Action() {
