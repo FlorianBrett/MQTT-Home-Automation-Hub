@@ -21,7 +21,7 @@ bool Constraint::resolveConstraint() {
 
 	bool resolution = false;
 	DBHandler db;
-	std::string fieldValue = db.getStateValue2(deviceID,fieldID);
+	std::string fieldValue = db.getStateValue(deviceID,fieldID);
 	db.closeDB();
 	if (constraintOperator.compare("=") == 0) {
 		if (atoi(fieldValue.c_str()) == atoi(constraintValue.c_str()))

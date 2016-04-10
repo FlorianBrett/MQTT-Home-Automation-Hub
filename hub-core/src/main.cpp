@@ -50,15 +50,8 @@ int main(int argc, char* argv[])
 	std::cout << "Starting reflector\n";
 	while (true)
 	{
-		//TODO Check if setup
 		MQTTMessage message = inBuffer.remove();
 		NewState state(message,&outBuffer);
-		//if(message.getTopic() == "/esp1/switch1")
-		//{
-		//	MQTTMessage message2{"/esp1/led1",message.getMessage()};
-		//	outBuffer.add(message2);
-		//}
-
 	}
 
 }

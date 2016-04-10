@@ -22,7 +22,7 @@ Action::Action(std::string actionID) {
 void Action::commitAction(MQTTMessageBuffer *outBufferPointer)
 {
 	DBHandler db;
-	std::string fieldValue = db.getStateValue2(deviceID,fieldID);
+	std::string fieldValue = db.getStateValue(deviceID,fieldID);
 	db.closeDB();
 	std::string topic = "/" + deviceID + "/" + fieldID;
 	std::string message;

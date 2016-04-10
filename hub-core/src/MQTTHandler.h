@@ -13,6 +13,17 @@ extern "C" {
 }
 #include "string.h"
 #include "MQTTMessageBuffer.h"
+
+/**
+ * A MQTT handler class.
+ * A class to connect the MQTT broker, add incoming message to inBuffer and publish messages from the outBuffer.
+ *
+ *  @author Florian Brett
+ *  @version 0.1
+ *  @date Created 09/03/16
+ *  @date Updated 09/04/16 Commented header file
+ *  @copyright GNU Public License
+ */
 class MQTTHandler {
 
 private:
@@ -33,6 +44,6 @@ public:
 	MQTTHandler(MQTTMessageBuffer *inBufferPointer, MQTTMessageBuffer *outBufferPointer);
 	void publishOutBuffer();
 	bool getConnectionStatus();
-	virtual ~MQTTHandler(); // auto created research reason for it
+	virtual ~MQTTHandler();
 };
 #endif /* MQTTHANDLER_H_ */

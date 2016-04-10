@@ -17,7 +17,7 @@
 bool NewState::checkStateChange() {
 	bool stateChanged = false;
 	DBHandler db;
-	std::string originalValue = db.getStateValue2(device,field);
+	std::string originalValue = db.getStateValue(device,field);
 	std::cout <<"Comparing: '" << value << "' AND '" << originalValue << "'" <<"\n";
 	if (value.compare(originalValue) != 0)
 	{
@@ -43,7 +43,7 @@ NewState::NewState(MQTTMessage inMessage,MQTTMessageBuffer *outBufferPointer) {
 	if (checkStateChange() == true)
 	{
 		DBHandler db;
-		db.setStateValue2(device,field,value);
+		db.setStateValue(device,field,value);
 		std::vector<std::string> ruleIDs = db.getRuleIDs(device,field);
 		//db.~DBHandler();
 		db.closeDB();

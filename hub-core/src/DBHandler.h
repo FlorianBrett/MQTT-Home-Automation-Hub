@@ -22,10 +22,10 @@ public:
 	void sqlExec(char* inSQL);
 	void sqlExec(std::string sql);
 	char* selectConfig(std::string name);
-	char* getStateValue(std::string device,std::string field);
-	std::string getStateValue2(std::string device,std::string field);
+	std::string loadConfig(std::string name);
+	std::string getStateValue(std::string device,std::string field);
 	void setStateValue(std::string device,std::string field,std::string value);
-	void setStateValue2(std::string device,std::string field,std::string value);
+	void addStateHistory(std::string device,std::string field,std::string value);
 	std::vector<std::string> getRuleIDs(std::string device,std::string field);
 	std::vector<std::string> getConstraintIDs(std::string ruleID);
 	std::vector<std::string> getConstraint(std::string constraintID);

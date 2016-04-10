@@ -39,8 +39,6 @@ void DBHandler::sqlExec(std::string sql)
 {
 	char *zErrMsg = 0;
 	int  rc;
-	//inSQL = "SELECT * from COMPANY";
-	//TODO 4th argument can be used for a passback
 	rc = sqlite3_exec(db, sql.c_str(), &cb_Output, 0, &zErrMsg);
 	if( rc != SQLITE_OK ){
 	fprintf(stderr, "SQL error: %s\n", zErrMsg);
@@ -70,37 +68,41 @@ char* DBHandler::selectConfig(std::string name)
 
 	return result;
 }
-char* DBHandler::getStateValue(std::string device,std::string field)
+std::string DBHandler::loadConfig(std::string name)
 {
 	std::string sql;
 	char* result;
 	sqlite3_stmt *sqlStatement;
-	sql = "SELECT * FROM field WHERE device_id = '" + device + "' AND field_id = '" + field + "';";
+	sql = "SELECT * FROM CONFIG WHERE name = '" + name + "';";
 	//std::cout <<"SQL Statement: " << sql << '\n';
 	if(sqlite3_prepare_v2(db, sql.c_str(), -1, &sqlStatement, 0) == SQLITE_OK)
 	{
 		if(sqlite3_step(sqlStatement) == SQLITE_ROW)
 		{
-			result = (char*)sqlite3_column_text(sqlStatement, 5);
+			result = (char*)sqlite3_column_text(sqlStatement, 2);
 		}
 	}
 	else
 		std::cout <<"sqlite Prepare fail" << '\n';
-	if (result == NULL)
+
+	if (result != NULL)
+		std::cout <<"Config loaded " << name << " : " << std::string(result) << '\n';
+	else
 	{
-		result = "NULL";
+		std::cout <<"Config not found\n";
+		result = "NOTFOUND";
 	}
-	std::cout <<"State loaded for " << device << "/" << field <<" : " << std::string(result) << '\n';
-	sqlite3_finalize(sqlStatement);
-	return result;
+	std::string returnResult = std::string(result);
+
+	return returnResult;
 }
-std::string DBHandler::getStateValue2(std::string device,std::string field)
+std::string DBHandler::getStateValue(std::string device,std::string field)
 {
 	std::string sql;
 	char* result;
 	sqlite3_stmt *sqlStatement;
 	sql = "SELECT * FROM field WHERE device_id = '" + device + "' AND field_id = '" + field + "';";
-	//std::cout <<"SQL Statement: " << sql << '\n';
+
 	if(sqlite3_prepare_v2(db, sql.c_str(), -1, &sqlStatement, 0) == SQLITE_OK)
 	{
 		if(sqlite3_step(sqlStatement) == SQLITE_ROW)
@@ -112,7 +114,7 @@ std::string DBHandler::getStateValue2(std::string device,std::string field)
 		std::cout <<"sqlite Prepare fail" << '\n';
 	if (result == NULL)
 	{
-		result = "NULL";
+		result = "EMPTY";
 	}
 	std::string returnResult = std::string(result);
 	//std::cout <<"State loaded for " << device << "/" << field <<" : " << returnResult << '\n';
@@ -122,40 +124,33 @@ std::string DBHandler::getStateValue2(std::string device,std::string field)
 void DBHandler::setStateValue(std::string device,std::string field,std::string value)
 {
 	std::string sql;
-	char* result;
-	sqlite3_stmt *sqlStatement;
-	sql = "UPDATE field SET field_value='" + value + "' WHERE device_id ='" + device + "' AND field_id = '" + field + "';";
-	//std::cout <<"SQL Statement: " << sql << '\n';
-
-	char *zErrMsg = 0;
-	if (sqlite3_exec(db, sql.c_str(), &cb_Output, 0, &zErrMsg) != SQLITE_OK)
-	{
-		fprintf(stderr, "SQL error: %s\n", zErrMsg);
-		sqlite3_free(zErrMsg);
-	}
-	else
-	{
-		//std::cout <<"State updated for " << device << "/" << field <<" : " << value << '\n';
-	}
-	sqlite3_finalize(sqlStatement);
-}
-void DBHandler::setStateValue2(std::string device,std::string field,std::string value)
-{
-	std::string sql;
-	char* result;
 	sqlite3_stmt *sqlStatement;
 	sql = "UPDATE field SET field_value='" + value + "' WHERE device_id='" + device + "' AND field_id='" + field + "';";
-	//std::cout <<"SQL Statement: " << sql << '\n';
 
-	if(sqlite3_prepare_v2(db, sql.c_str(), -1, &sqlStatement, 0) == SQLITE_OK)
-	{
+	if(sqlite3_prepare_v2(db, sql.c_str(), -1, &sqlStatement, 0) == SQLITE_OK) {
 		sqlite3_step(sqlStatement);
-		//std::cout <<"sqlite UPDATE COMPLETE :" << sqlite3_step(sqlStatement) <<'\n';
 	}
 	else
 		std::cout <<"sqlite Prepare fail" << '\n';
 	sqlite3_finalize(sqlStatement);
-	//std::cout <<"State updated for " << device << "/" << field <<" : " << value << '\n';
+	if(loadConfig("state_history").compare("1") == 0)
+		addStateHistory(device, field, value);
+}
+void DBHandler::addStateHistory(std::string device,std::string field,std::string value)
+{
+	std::string sql;
+	sqlite3_stmt *sqlStatement;
+	//TODO Ensure time stored is correct(Could be an hour out)
+	sql = "INSERT INTO state_history(device_id,field_id,state_time,state_value) VALUES ('" + device + "','" + field + "',CURRENT_TIMESTAMP,'" + value + "');";
+
+	if(sqlite3_prepare_v2(db, sql.c_str(), -1, &sqlStatement, 0) == SQLITE_OK) {
+		sqlite3_step(sqlStatement);
+		std::cout <<"State history updated for " << device << "/" << field <<" : " << value << '\n';
+	}
+	else
+		std::cout <<"sqlite Prepare fail" << '\n';
+	sqlite3_finalize(sqlStatement);
+
 }
 std::vector<std::string> DBHandler::getRuleIDs(std::string device,std::string field)
 {

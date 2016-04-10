@@ -1,8 +1,5 @@
 /*
  * MQTTMessage.cpp
- *
- *  Created on: 9 Mar 2016
- *      Author: flo
  */
 
 #include "MQTTMessage.h"
