@@ -14,7 +14,7 @@
 #include <array>
 #include <unistd.h>
 #include "DBHandler.h"
-
+#include "spdlog/spdlog.h"
 RuleTimer::RuleTimer(int inSleepTime,RuleBuffer *ruleBufferPointer,MQTTMessageBuffer *outBufferPointer) {
 	sleepTime = inSleepTime;
 	ruleBuffer = ruleBufferPointer;

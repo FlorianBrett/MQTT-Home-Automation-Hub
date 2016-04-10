@@ -1,6 +1,6 @@
 /*
  * NewState.h
- *
+ *dd
  *  Created on: 15 Mar 2016
  *      Author: flo
  */
@@ -11,9 +11,11 @@
 #include "MQTTMessage.h"
 #include "Rule.h"
 #include <vector>
+#include "spdlog/spdlog.h"
 
 class NewState {
 private:
+	std::shared_ptr<spdlog::logger> logger;
 	std::string device;
 	std::string field;
 	std::string value;

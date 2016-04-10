@@ -12,7 +12,9 @@
 #include <iostream>
 #include <vector>
 #include <iterator>
+#include "spdlog/spdlog.h"
 
+sqlite3 *DBHandler::db = NULL;
 int DBHandler::cb_Output(void *data, int argc, char **argv, char **azColName){
    int i;
    fprintf(stderr, "%s: ", (const char*)data);
@@ -86,7 +88,7 @@ std::string DBHandler::loadConfig(std::string name)
 		std::cout <<"sqlite Prepare fail" << '\n';
 
 	if (result != NULL)
-		std::cout <<"Config loaded " << name << " : " << std::string(result) << '\n';
+		logger->debug() <<"Config loaded " << name << " : " << std::string(result);
 	else
 	{
 		std::cout <<"Config not found\n";
@@ -117,7 +119,7 @@ std::string DBHandler::getStateValue(std::string device,std::string field)
 		result = "EMPTY";
 	}
 	std::string returnResult = std::string(result);
-	//std::cout <<"State loaded for " << device << "/" << field <<" : " << returnResult << '\n';
+	logger->debug() <<"State loaded for " << device << "/" << field <<" : " << returnResult;
 	sqlite3_finalize(sqlStatement);
 	return returnResult;
 }
@@ -129,9 +131,11 @@ void DBHandler::setStateValue(std::string device,std::string field,std::string v
 
 	if(sqlite3_prepare_v2(db, sql.c_str(), -1, &sqlStatement, 0) == SQLITE_OK) {
 		sqlite3_step(sqlStatement);
+		logger->debug() << "State updated for " << device << "/" << field <<" to: " << value;
 	}
 	else
 		std::cout <<"sqlite Prepare fail" << '\n';
+
 	sqlite3_finalize(sqlStatement);
 	if(loadConfig("state_history").compare("1") == 0)
 		addStateHistory(device, field, value);
@@ -142,10 +146,9 @@ void DBHandler::addStateHistory(std::string device,std::string field,std::string
 	sqlite3_stmt *sqlStatement;
 	//TODO Ensure time stored is correct(Could be an hour out)
 	sql = "INSERT INTO state_history(device_id,field_id,state_time,state_value) VALUES ('" + device + "','" + field + "',CURRENT_TIMESTAMP,'" + value + "');";
-
 	if(sqlite3_prepare_v2(db, sql.c_str(), -1, &sqlStatement, 0) == SQLITE_OK) {
 		sqlite3_step(sqlStatement);
-		std::cout <<"State history updated for " << device << "/" << field <<" : " << value << '\n';
+		logger->debug() << "State History inserted for " << device << "/" << field <<" : " << value;
 	}
 	else
 		std::cout <<"sqlite Prepare fail" << '\n';
@@ -210,6 +213,12 @@ std::vector<std::string> DBHandler::getConstraint(std::string constraintID)
 	else
 		std::cout <<"sqlite Prepare fail" << '\n';
 	sqlite3_finalize(sqlStatement);
+
+	std::string debugResult = "getConstraint Results: ";
+	for(std::vector<std::string>::iterator it = results.begin(); it != results.end(); ++it) {
+		debugResult += "[" + *it + "] ";
+	}
+	logger->debug(debugResult);
 	return results;
 }
 std::vector<std::string> DBHandler::getActionIDs(std::string ruleID)
@@ -297,7 +306,7 @@ std::vector<std::array<int,2>> DBHandler::getTimerRules(int startTime, int finis
 			}
 		}
 		else
-			std::cout <<"sqlite Prepare fail" << '\n';
+			logger->critical() << "sqlite Prepare fail";
 		//std::cout << "TimerRuleID Results: ";
 		for(std::vector<std::array<int,2>>::iterator it = results.begin(); it != results.end(); ++it) {
 		    std::cout << "[" << it->operator [](0) << "/" << it->operator [](1) << "] ";
@@ -307,21 +316,24 @@ std::vector<std::array<int,2>> DBHandler::getTimerRules(int startTime, int finis
 }
 void DBHandler::closeDB()
 {
-	sqlite3_close(db);
-	//std::cout <<"Closed DB connection " << '\n';
+	//sqlite3_close(db);
+	logger->debug() << "DB connection closed";
 }
 
 
 DBHandler::DBHandler() {
-	 //sqlite3 *db;
+	logger = spdlog::get("DB");
 	int  rc;
-   /* Open database */
-	   rc = sqlite3_open("test6.db", &db);
-	   if( rc ){
-	      fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
-	   }else{
-	      //fprintf(stdout, "Opened database successfully\n");
-	   }
+	if (db == NULL)
+	{
+		rc = sqlite3_open("test6.db", &db);
+		if(rc){
+			logger->critical() << "DB connection can not be opened: " << sqlite3_errmsg(db);
+		}
+		else{
+			logger->debug() << "DB connection opened";
+		}
+	}
 }
 
 DBHandler::~DBHandler() {

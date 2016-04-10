@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include "spdlog/spdlog.h"
 Rule::Rule(std::string inRuleID) {
 	ruleID=inRuleID;
 }
@@ -30,6 +31,7 @@ void Rule::loadRule() {
 	}
 }
 bool Rule::resolveRule() {
+	auto logger = spdlog::get("RULE");
 	bool resolution = true;
 	for(std::vector<Constraint>::iterator it = constraints.begin(); it != constraints.end(); ++it) {
 		if(it->resolveConstraint() == false)
@@ -38,9 +40,9 @@ bool Rule::resolveRule() {
 		}
 	}
 	if (resolution == true)
-		std::cout << "Rule" << ruleID  << ": resolved TRUE \n";
+		logger->info() << "Rule" << ruleID  << ": resolved TRUE";
 	else
-		std::cout << "Rule" << ruleID  << ": resolved FALSE \n";
+		logger->info() << "Rule" << ruleID  << ": resolved FALSE";
 	return resolution;
 }
 void Rule::commitActions(MQTTMessageBuffer *outBufferPointer) {

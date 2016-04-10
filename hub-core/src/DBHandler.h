@@ -12,10 +12,13 @@
 #include <string>
 #include <queue>
 #include <array>
+#include "spdlog/spdlog.h"
+
 class DBHandler {
 private:
-	sqlite3 *db;
+	static sqlite3 *db;
 	static int cb_Output(void *NotUsed, int argc, char **argv, char **azColName);
+	std::shared_ptr<spdlog::logger> logger;
 public:
 	DBHandler();
 	void closeDB();

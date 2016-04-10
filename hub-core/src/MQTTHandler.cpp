@@ -22,7 +22,6 @@ extern "C" {
 bool MQTTHandler::connectedStatic = false;
 MQTTMessageBuffer *MQTTHandler::inBuffer = NULL;
 MQTTMessageBuffer *MQTTHandler::outBuffer = NULL;
-//TODO buffer pointers
 
 // Callbacks
 int MQTTHandler::cb_MessageArrived(void *context, char *topicName, int topicLength, MQTTAsync_message *message)

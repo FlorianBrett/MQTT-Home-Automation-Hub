@@ -13,24 +13,25 @@
 #include <iterator>
 #include "Rule.h"
 #include "MQTTMessageBuffer.h"
+#include "spdlog/spdlog.h"
 
 bool NewState::checkStateChange() {
 	bool stateChanged = false;
 	DBHandler db;
 	std::string originalValue = db.getStateValue(device,field);
-	std::cout <<"Comparing: '" << value << "' AND '" << originalValue << "'" <<"\n";
+	logger->info() <<"Comparing: '" << value << "' AND '" << originalValue << "'";
 	if (value.compare(originalValue) != 0)
 	{
-		std::cout <<"State Changed. Updating DB." <<"\n";
+		logger->info() << "State Changed. Updating DB.";
 		stateChanged = true;
 	}
 	else
-		std::cout <<"State not Changed" <<"\n";
-	//db.~DBHandler();
+		logger->info() << "State not Changed.";
 	db.closeDB();
 	return stateChanged;
 }
 NewState::NewState(MQTTMessage inMessage,MQTTMessageBuffer *outBufferPointer) {
+	logger = spdlog::get("GLOBAL");
 	std::string topic = inMessage.getTopic();
 	topic.erase(0,1);
 	int pos = topic.find("/");
@@ -38,26 +39,27 @@ NewState::NewState(MQTTMessage inMessage,MQTTMessageBuffer *outBufferPointer) {
 	topic.erase(0, pos + 1);
 	field = topic;
 	value = inMessage.getMessage();
-	std::cout <<"\nNew State: " << device << "/" << field << "=" << value <<"\n";
+	logger->info() << "New State: " << device << "/" << field << "=" << value;
 
 	if (checkStateChange() == true)
 	{
 		DBHandler db;
 		db.setStateValue(device,field,value);
+		logger->info() << "state updated to" << db.getStateValue(device,field);
 		std::vector<std::string> ruleIDs = db.getRuleIDs(device,field);
-		//db.~DBHandler();
+
 		db.closeDB();
 		if(ruleIDs.size() > 0)
 		{
-			std::cout <<"Rules found for "<< device << "/" << field << ": ";
+			std::string debug = "Rules found for " + device + "/" + field + ": ";
 			for(std::vector<std::string>::iterator it = ruleIDs.begin(); it != ruleIDs.end(); ++it)
 			{
-				std::cout << *it << " ";
+				debug += (*it + " ");
 				Rule tempRule(*it);
 
 				rules.push_back(tempRule);
 			}
-			std::cout << "\n";
+			logger->info(debug);
 			for(std::vector<Rule>::iterator it = rules.begin(); it != rules.end(); ++it)
 			{
 				it->loadRule();
@@ -67,12 +69,10 @@ NewState::NewState(MQTTMessage inMessage,MQTTMessageBuffer *outBufferPointer) {
 		}
 		else
 		{
-			std::cout <<"No rules found for "<< device << "/" << field << "\n";
+			logger->info() << "No rules found for "<< device << "/" << field;
 		}
 	}
-
-	// TODO Check matching rules
-	// TODO Create rules
+	logger->info() << "New State complete";
 }
 
 NewState::~NewState() {
