@@ -16,54 +16,54 @@
 #include "DBHandler.h"
 #include "spdlog/spdlog.h"
 RuleTimer::RuleTimer(int inSleepTime,RuleBuffer *ruleBufferPointer,MQTTMessageBuffer *outBufferPointer) {
-	sleepTime = inSleepTime;
+	logger = spdlog::get("TIMER");
+	normalSleepTime = inSleepTime;
 	ruleBuffer = ruleBufferPointer;
 	outBuffer = outBufferPointer;
 }
 void RuleTimer::startTimer(){
-	std::vector<std::array<int,2>> times2;
+	logger->info() << "Rule firing timer started";
+	std::vector<std::array<int,2>> ruleTimes;
 
 	while(true)
 	{
-		sleepTime = 10;
+		int sleepTime = 10;
 		//GET TIME
 		time_t currentTime;
 		struct tm *timeData;
 		time (&currentTime);
 		timeData = localtime (&currentTime);
 		int secondsOfDay = (timeData->tm_hour * (60 * 60)) + (timeData->tm_min * 60) + timeData->tm_sec;
+		logger->trace() << "Awake at: " << secondsOfDay << " Seconds";
 
-		//std::cout << "TIme in Seconds: " << secondsOfDay << "\n";
-
-		//fire
-		while (times2.size() > 0 && times2.back().operator [](1) <= secondsOfDay)
+		while (ruleTimes.size() > 0 && ruleTimes.back().operator [](1) <= secondsOfDay)
 		{
-			int ruleID = times2.back().operator [](0);
-			std::cout << "/nTimer Fire: ruleID:"<< ruleID << " Time: " << times2.back().operator [](1) << "\n";
+			int ruleID = ruleTimes.back().operator [](0);
+			logger->info() << "Rule timer firing on ruleID" << ruleID;
 			Rule rule(std::to_string(ruleID));
 			ruleBuffer->add(rule);
-			times2.pop_back();
+			ruleTimes.pop_back();
 		}
 
 		DBHandler db;
-		times2 = db.getTimerRules(secondsOfDay + 1,secondsOfDay + sleepTime);
+		ruleTimes = db.getTimerRules(secondsOfDay + 1,secondsOfDay + sleepTime);
 		db.closeDB();
-		if (times2.size() > 0)
+		if (ruleTimes.size() > 0)
 		{
-			int tilNextFire = times2.back().operator [](1) - secondsOfDay;
-			if (tilNextFire < sleepTime)
-			{
-				sleepTime = tilNextFire;
-			}
+			logger->trace() << "timer constraints found within next" << sleepTime << " seconds";
+			int tilNextFire = ruleTimes.back().operator [](1) - secondsOfDay;
+			sleepTime = tilNextFire;
 		}
 		//NEW DAY FIX
 		if(secondsOfDay + sleepTime >= ((24 * 60 * 60)))
 		{
+			logger->trace() << "New day calculation fix";
 			sleepTime = (24 * 60 * 60) - secondsOfDay;
 			DBHandler db;
-			times2 = db.getTimerRules(0,sleepTime);
+			ruleTimes = db.getTimerRules(0,sleepTime);
 			db.closeDB();
 		}
+		logger->trace() << "Sleeping for:" << sleepTime << " Seconds";
 		usleep(sleepTime * 1000000);
 	}
 }

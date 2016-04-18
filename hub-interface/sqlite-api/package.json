@@ -1,0 +1,16 @@
+{
+  "name": "sqlite-api",
+  "version": "1.0.0",
+  "description": "An API to interface with my sqlite3 database.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Florian Brett",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.15.0",
+    "express": "^4.13.4",
+    "sqlite3": "^3.1.3"
+  }
+}

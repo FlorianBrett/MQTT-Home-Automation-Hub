@@ -22,14 +22,13 @@
 #include "RuleBuffer.h"
 #include "spdlog/spdlog.h"
 
-
 int main(int argc, char* argv[])
 {
 	std::vector<spdlog::sink_ptr> sinks;
 
 	sinks.push_back(std::make_shared<spdlog::sinks::stdout_sink_st>());
-	sinks.push_back(std::make_shared<spdlog::sinks::daily_file_sink_st>("logfile", "txt", 23, 59));
-
+	sinks.push_back(std::make_shared<spdlog::sinks::daily_file_sink_st>("logs/logfile", "txt", 23, 59));
+	//TODO Something is wrong with log file sync when low amounts of traffic log file is empty
 	auto logger = std::make_shared<spdlog::logger>("GLOBAL", begin(sinks), end(sinks));
 	auto dbLogger = std::make_shared<spdlog::logger>("DB", begin(sinks), end(sinks));
 	auto ruleLogger = std::make_shared<spdlog::logger>("RULE", begin(sinks), end(sinks));
@@ -41,11 +40,8 @@ int main(int argc, char* argv[])
 	spdlog::register_logger(ruleLogger);
 	spdlog::register_logger(timerLogger);
 	spdlog::register_logger(mqttLogger);
-    //auto logger = spdlog::stdout_logger_mt("hub-core", true /*use color*/);
 
-    logger->info() << "Starting hub-core...";
-    logger->set_level(spdlog::level::info); //default
-   // dbLogger->set_level(spdlog::level::debug);
+    logger->notice() << "Starting hub-core...";
 
 
 	std::ifstream file("database.sql");
@@ -59,14 +55,26 @@ int main(int argc, char* argv[])
 	DBHandler db;
 	db.sqlExec(sqlString);
 	//should update more regularly
-	if(db.loadConfig("global_debug_on").compare("1") == 1){
-		logger->set_level(spdlog::level::debug);
-	}
+	int globalLoggingLevel = atoi(db.loadConfig("global_logging_level").c_str());
+	logger->set_level(spdlog::level::level_enum(globalLoggingLevel));
+
+	int dbLoggingLevel = atoi(db.loadConfig("db_logging_level").c_str());
+	dbLogger->set_level(spdlog::level::level_enum(dbLoggingLevel));
+
+	int ruleLoggingLevel = atoi(db.loadConfig("rule_logging_level").c_str());
+	ruleLogger->set_level(spdlog::level::level_enum(ruleLoggingLevel));
+
+	int timerLoggingLevel = atoi(db.loadConfig("timer_logging_level").c_str());
+	timerLogger->set_level(spdlog::level::level_enum(timerLoggingLevel));
+
+	int mqttLoggingLevel = atoi(db.loadConfig("mqtt_logging_level").c_str());
+	mqttLogger->set_level(spdlog::level::level_enum(mqttLoggingLevel));
+
 	db.closeDB();
 
 	MQTTMessageBuffer inBuffer(100);
-	MQTTMessageBuffer outBuffer(10);
-	RuleBuffer ruleBuffer(10);
+	MQTTMessageBuffer outBuffer(100);
+	RuleBuffer ruleBuffer(100);
 
 	MQTTHandler mqttInstance{&inBuffer,&outBuffer};
 	std::thread PublishThread(&MQTTHandler::publishOutBuffer,&mqttInstance);
@@ -75,10 +83,10 @@ int main(int argc, char* argv[])
 	std::thread TimerFireThread(&RuleTimer::startTimer,&time);
 	std::thread RuleBufferResolutionThread(&RuleTimer::ruleBufferResolution,&time);
 
-	std::cout << "Starting reflector\n";
 	while (true)
 	{
 		MQTTMessage message = inBuffer.remove();
+		//TODO Filter system messages(New device, re evaluate all rules
 		NewState state(message,&outBuffer);
 	}
 

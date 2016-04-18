@@ -10,9 +10,10 @@
 #include "RuleBuffer.h"
 class RuleTimer {
 private:
-	int sleepTime;
+	int normalSleepTime;
 	RuleBuffer *ruleBuffer;
 	MQTTMessageBuffer *outBuffer;
+	std::shared_ptr<spdlog::logger> logger;
 public:
 	RuleTimer(int inSleepTime,RuleBuffer *ruleBufferPointer,MQTTMessageBuffer *outBufferPointer);
 	void startTimer();
