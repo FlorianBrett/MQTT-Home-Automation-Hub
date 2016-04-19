@@ -46,14 +46,61 @@
               <input ng-model="edit.editRule.rule_name" type="text"></input>
               <input ng-model="edit.editRule.rule_description" type="text"></input>
               <input type="checkbox" ng-model="edit.editRule.rule_active" ng-true-value="1" ng-false-value="0" bootstrap-switch />
-              <input type="submit" ng-click="nav.setMode(1)"value="Submit"/>
+              <input type="submit" ng-click="nav.setMode(1)" value="Submit"/>
             </form>
           </div>
 
           <div class="col-sm-6" style="padding:0px">
             <div class="panel panel-default" style="margin:0px">
-              <div class="panel-heading "><h5>Constraints</h5></div>
-              <div class="panel-body">Panel Content</div>
+              <div class="panel-heading ">
+                <h5>Constraints</h5>
+              </div>
+              <div class="panel-body" ng-controller="constraintListCtrl as ruleList"> 
+                <div id="constraintContainer" ng-repeat="constraint in constraints" ng-controller="constraintCtrl as constraintCtrl" style="overflow: auto">
+                <div id ="viewConstraint" ng-show="constraintCtrl.isEdit(0)">
+                  <span class="col-sm-3" style="padding:0px">{{constraint.field_id}}</span>
+                  <span class="col-sm-3" style="padding:0px">{{constraint.constraint_operator}}</span>
+                  <span class="col-sm-3" style="padding:0px">{{constraint.constraint_value}}</span>
+                </div>
+                 <div id ="editConstraint" ng-show="constraintCtrl.isEdit(1)">
+                  <span class="col-sm-3" style="padding:0px"><input style="width:100%" ng-model="constraintCtrl.editConstraint.field_id" type="text"></input></span>
+                  <span class="col-sm-3" style="padding:0px"><input style="width:100%" ng-model="constraintCtrl.editConstraint.constraint_operator" type="text"></input></span>
+                  <span class="col-sm-3" style="padding:0px"><input style="width:100%" ng-model="constraintCtrl.editConstraint.constraint_value" type="text"></input></span>
+                </div>               
+
+                <span class="col-sm-3" style="padding:0px">
+                &nbsp;
+                  <a href ng-show="constraintCtrl.isEdit(0)" ng-click="constraintCtrl.initEdit(constraint)"><span class="glyphicon glyphicon-pencil"></span>edit</a>
+                  <a href ng-show="constraintCtrl.isEdit(1)" ng-click="constraintCtrl.submitEdit(constraint)"><span class="glyphicon glyphicon-floppy-disk"></span>save</a>
+                  <a href ng-show="constraintCtrl.isEdit(1)" ng-click="constraintCtrl.setEdit(0)"><span class="glyphicon glyphicon-remove"></span>cancel</a>
+                  <a href ng-show="constraintCtrl.isEdit(0)" ng-click="constraintCtrl.deleteConstraint(constraint,constraints)"><span class="glyphicon glyphicon-remove"></span>remove</a>
+
+                </span>
+                <hr class="divider" >
+                </div>
+
+                <div id="createConstraintContainer" ng-controller="constraintCtrl as constraintCtrl" style="overflow: auto">
+                <div id ="viewConstraint" ng-show="constraintCtrl.isEdit(0)">
+                  <span class="col-sm-9" style="padding:0px"></span>
+                </div>
+                 <div id ="editConstraint" ng-show="constraintCtrl.isEdit(1)">
+                  <span class="col-sm-3" style="padding:0px"><input style="width:100%" ng-model="constraintCtrl.editConstraint.field_id" type="text"></input></span>
+                  <span class="col-sm-3" style="padding:0px"><input style="width:100%" ng-model="constraintCtrl.editConstraint.constraint_operator" type="text"></input></span>
+                  <span class="col-sm-3" style="padding:0px"><input style="width:100%" ng-model="constraintCtrl.editConstraint.constraint_value" type="text"></input></span>
+                </div>               
+
+                <span class="col-sm-3" style="padding:0px">
+                &nbsp;
+                  <a href ng-show="constraintCtrl.isEdit(0)" ng-click="constraintCtrl.initCreate()"><span class="glyphicon glyphicon-plus"></span>New Constraint</a>
+                  <a href ng-show="constraintCtrl.isEdit(1)" ng-click="constraintCtrl.createConstraint(rule,constraint,constraints)"><span class="glyphicon glyphicon-floppy-disk"></span>save
+                  <a href ng-show="constraintCtrl.isEdit(1)" ng-click="constraintCtrl.setEdit(0)"><span class="glyphicon glyphicon-remove"></span>cancel</a>
+
+                </span>
+                </div>
+
+
+
+              </div>
             </div>
           </div>
           <div class="col-sm-6" style="padding:0px">
@@ -71,9 +118,9 @@
             <h4 style="float:left">{{rule.rule_name}}</h4>
           </div>
           <ul class="nav nav-pills" style="float:right">
-            <li ng-class="{ active:nav.isMode(2)}" ng-show="nav.isMode(1)"><a href ng-click="nav.setMode(2)">Create new rule</a></li>
-            <li ng-class="{ active:nav.isMode(1)}" ng-show="nav.isMode(2)" ><a href ng-click="nav.setMode(1)">Save</a></li>
-            <li ng-class="{ active:nav.isMode(1)}" ng-show="nav.isMode(2)" ><a href ng-click="nav.setMode(1)">Cancel</a></li>
+            <li ng-class="{ active:nav.isMode(2)}" ng-show="nav.isMode(1)"><a href ng-click="nav.setMode(2)"><span class="glyphicon glyphicon-plus"></span>Create new rule</a></li>
+            <li ng-class="{ active:nav.isMode(1)}" ng-show="nav.isMode(2)" ><a href ng-click="nav.setMode(1)"><span class="glyphicon glyphicon-floppy-disk"></span>Save</a></li>
+            <li ng-class="{ active:nav.isMode(1)}" ng-show="nav.isMode(2)" ><a href ng-click="nav.setMode(1)"><span class="glyphicon glyphicon-remove"></span>Cancel</a></li>
           </ul>
         </div>
         <div id="ruleBody" class="panel-body" ng-show="nav.isMode(2)">

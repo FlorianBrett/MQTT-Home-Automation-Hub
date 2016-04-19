@@ -65,7 +65,7 @@ restapi.post('/rules', function(req, res){
 					console.log("Rule failed to insert");
 					res.json({ message: 'Rule failed to insert' });
 				}
-		        });
+		    });
         }
         else {
 			console.log("Rule failed to insert");
@@ -149,16 +149,28 @@ restapi.delete('/rules/:rule_id', function(req, res){
 
 
 
-//POST /rules Creates a new rule
+//POST /rules Creates a new constraint
 restapi.post('/rules/:rule_id/constraints', function(req, res){
 	console.log("POST /rules Creates a new rule");
-	var sql = "INSERT INTO rule_constraint (rule_id,field_id,constraint_operator,constraint_value) VALUES (" + req.query.rule_id + ",'" + req.query.field_id + "','" + req.query.constraint_operator + "'," + req.query.constraint_value + ")";
+	var sql = "INSERT INTO rule_constraint (rule_id,field_id,constraint_operator,constraint_value) VALUES (" + req.body.rule_id + ",'" + req.body.field_id + "','" + req.body.constraint_operator + "'," + req.body.constraint_value + ")";
 	console.log(sql);
 	//COULD RETURN NEW RULE OR JUST ID?
-	db.run(sql, function(err, data){
+	db.get(sql, function(err, data){
         if (!err) {
-            console.log("Rule inserted");
-            res.json({ message: 'Rule inserted' });
+        	db.get("SELECT last_insert_rowid()", function(err, data){
+		        if (!err) {
+		        	console.log(data);
+		        	var constraint = req.body;
+		        	constraint.constraint_id = data['last_insert_rowid()'];
+		        	console.log(constraint);
+		        	res.json(constraint);
+		        	console.log("Rule inserted");
+		        }
+		        else {
+					console.log("Rule failed to insert");
+					res.json({ message: 'Rule failed to insert' });
+				}
+		    });
         }
         else {
 			console.log("Rule failed to insert");
@@ -206,7 +218,7 @@ restapi.get('/rules/:rule_id/constraints/:constraint_id', function(req, res){
 //PUT /rules Updates rule based on id
 restapi.put('/rules/:rule_id/constraints/:constraint_id', function(req, res){
 	console.log("PUT /rules Updates rule based on id:?",req.params.rule_id);
-	var sql = "UPDATE rule SET rule_name = '" + req.body.rule_name + "', rule_description = '" + req.body.rule_description + "', rule_active = " + req.body.rule_active +" WHERE rule_id=" + req.params.rule_id;
+	var sql = "UPDATE rule_constraint SET field_id = '" + req.body.field_id + "', constraint_operator = '" + req.body.constraint_operator + "', constraint_value = " + req.body.constraint_value +" WHERE constraint_id=" + req.params.constraint_id;
 	console.log(sql);
 	db.run(sql, function(err, row){
         if (!err){
@@ -221,8 +233,8 @@ restapi.put('/rules/:rule_id/constraints/:constraint_id', function(req, res){
 
 //DELETE /rules deletes rule based on id
 restapi.delete('/rules/:rule_id/constraints/:constraint_id', function(req, res){
-	console.log("DELETE /rules deletes rule based on id:?",req.params.rule_id);
-	var sql = "DELETE FROM rule WHERE rule_id=" + req.params.rule_id;
+	console.log("DELETE /rules deletes rule based on id:?",req.params.constraint_id);
+	var sql = "DELETE FROM rule_constraint WHERE constraint_id=" + req.params.constraint_id;
 	console.log(sql);
 	db.run(sql, function(err, row){
         if (!err){
