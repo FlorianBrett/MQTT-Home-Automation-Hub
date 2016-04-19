@@ -44,14 +44,28 @@ function jsonConcat(o1, o2) {
 
 //POST /rules Creates a new rule
 restapi.post('/rules', function(req, res){
+	console.log(req.params);
+	console.log(req.body);
 	console.log("POST /rules Creates a new rule");
-	var sql = "INSERT INTO rule (rule_name,rule_description,rule_active) VALUES ('" + req.query.rule_name + "','" + req.query.rule_description + "'," + req.query.rule_active + ")";
+	var sql = "INSERT INTO rule (rule_name,rule_description,rule_active) VALUES ('" + req.body.rule_name + "','" + req.body.rule_description + "'," + req.body.rule_active + ")";
 	console.log(sql);
 	//COULD RETURN NEW RULE OR JUST ID?
-	db.run(sql, function(err, data){
+	db.get(sql, function(err, data){
         if (!err) {
-            console.log("Rule inserted");
-            res.json({ message: 'Rule inserted' });
+        	db.get("SELECT last_insert_rowid()", function(err, data){
+		        if (!err) {
+		        	console.log(data);
+		        	var rule = req.body;
+		        	rule.rule_id = data['last_insert_rowid()'];
+		        	console.log(rule);
+		        	res.json(rule);
+		        	console.log("Rule inserted");
+		        }
+		        else {
+					console.log("Rule failed to insert");
+					res.json({ message: 'Rule failed to insert' });
+				}
+		        });
         }
         else {
 			console.log("Rule failed to insert");

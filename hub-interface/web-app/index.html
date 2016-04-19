@@ -25,15 +25,19 @@
             <h4 style="float:left">{{rule.rule_name}}</h4>
           </div>
           <ul class="nav nav-pills" style="float:right">
-            <li ng-class="{ active:nav.isMode(1)}"><a href ng-click="nav.setMode(1)">View</a></li>
-            <li ng-class="{ active:nav.isMode(2)}"><a href ng-click="nav.setMode(2)">Edit</a></li>
-            <li><a href ng-click="ruleList.outlog">Delete</a></li>
+            <li ng-show="nav.isExpand(1)" ng-class="{ active:nav.isMode(1)}"><a href ng-click="nav.setMode(1)">View</a></li>
+            <li ng-show="nav.isExpand(1)" ng-class="{ active:nav.isMode(2)}"><a href ng-click="nav.setMode(2)"><span class="glyphicon glyphicon-pencil"></span>Edit</a></li>
+            <li><a href ng-show="nav.isExpand(1)" ng-controller="ruleDeleteCtrl as delete" ng-click="delete.deleteRule(rule,rules)"><span class="glyphicon glyphicon-remove"></span>Delete</a></li>
+
+            <li><a href ng-show="nav.isExpand(0)" ng-click="nav.setExpand(1)"><span class="glyphicon glyphicon-menu-down"></span>Expand</a></li>
+            <li><a href ng-show="nav.isExpand(1)" ng-click="nav.setExpand(0)"><span class="glyphicon glyphicon-menu-up"></span>Shrink</a></li>
+
           </ul>
         </div>
-        <div id="ruleBody" class="panel-body">
+        <div id="ruleBody" class="panel-body" ng-show="nav.isExpand(1)">
           <div id="viewRule" ng-show="nav.isMode(1)">
             <p>
-              {{rule.rule_description}}
+              {{rule.rule_id}}:{{rule.rule_description}}
               <input  bootstrap-switch type="checkbox" ng-model="rule.rule_active" ng-true-value="1" ng-false-value="0" data-on-color="info" />
             </p>
           </div>
@@ -60,6 +64,30 @@
           </div>
         </div>
       </div>
+
+      <div id="ruleContainer" ng-controller="ruleNavCtrl as nav" class="panel panel-default">
+        <div id="ruleHeader" class="panel-heading" style="overflow: auto">
+          <div id="viewTite">
+            <h4 style="float:left">{{rule.rule_name}}</h4>
+          </div>
+          <ul class="nav nav-pills" style="float:right">
+            <li ng-class="{ active:nav.isMode(2)}" ng-show="nav.isMode(1)"><a href ng-click="nav.setMode(2)">Create new rule</a></li>
+            <li ng-class="{ active:nav.isMode(1)}" ng-show="nav.isMode(2)" ><a href ng-click="nav.setMode(1)">Save</a></li>
+            <li ng-class="{ active:nav.isMode(1)}" ng-show="nav.isMode(2)" ><a href ng-click="nav.setMode(1)">Cancel</a></li>
+          </ul>
+        </div>
+        <div id="ruleBody" class="panel-body" ng-show="nav.isMode(2)">
+          <div id="editRule" >
+            <form name="editForm" ng-controller="ruleCreateCtrl as edit" ng-submit="edit.submitEdit(rule,rules)" ng-init="edit.initEdit()">
+              <input ng-model="edit.editRule.rule_name" type="text"></input>
+              <input ng-model="edit.editRule.rule_description" type="text"></input>
+              <input type="checkbox" ng-model="edit.editRule.rule_active" ng-true-value="1" ng-false-value="0" bootstrap-switch />
+              <input type="submit" ng-click="nav.setMode(1)"value="Submit"/>
+            </form>
+          </div>
+        </div>
+      </div>
+
     </div>
   </body>
 </html>
