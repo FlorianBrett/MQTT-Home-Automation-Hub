@@ -1,5 +1,5 @@
 (function(){
-	var app = angular.module('rule', [ ]);
+	var app = angular.module('rule', ['constraint','action' ]);
 
 	app.controller('actionListCtrl', [ '$scope' ,'$http', function($scope,$http){
 
@@ -123,5 +123,5 @@
 			controllerAs: 'ruleCtrl'
 		};
 	});
-	
+
 })();

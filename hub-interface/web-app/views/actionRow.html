@@ -1,7 +1,7 @@
 <td class="col-md-3">
   <span ng-show="actionCtrl.isEdit(0)">{{action.field_id}}</span>
-  <ol ng-show="actionCtrl.isEdit(1)" id="array-collection" class="nya-bs-select" ng-model="actionCtrl.editAction.field_id" style="width:100%">
-    <li nya-bs-option="option in fields group by option.device_name" data-value="option.field_id">
+  <ol ng-show="actionCtrl.isEdit(1)" class="nya-bs-select" ng-model="actionCtrl.editAction.field_id" style="width:100%">
+    <li nya-bs-option="option in fieldsCanSet group by option.device_name" data-value="option.field_id">
       <span class="dropdown-header">{{$group}}</span>
       <a>
         {{option.field_name}}
@@ -11,7 +11,7 @@
 </td>
 <td class="col-md-3">
   <span ng-show="actionCtrl.isEdit(0)">{{action.action_operator}}</span>
-   <ol ng-show="actionCtrl.isEdit(1)" id="array-collection" class="nya-bs-select" ng-model="actionCtrl.editAction.action_operator" style="width:100%">
+   <ol ng-show="actionCtrl.isEdit(1)" class="nya-bs-select" ng-model="actionCtrl.editAction.action_operator" style="width:100%">
     <li nya-bs-option="option in actionOperators" data-value="option.id">
       <a>
         {{option.name}}

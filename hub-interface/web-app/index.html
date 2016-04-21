@@ -16,6 +16,7 @@
     <script src="directives/constraintDirective.js"></script>
     <script src="directives/actionDirective.js"></script>
     <script src="directives/ruleDirective.js"></script>
+
 <link href="dist/css/nya-bs-select.css" rel="stylesheet">
 <script src="dist/js/nya-bs-select.js"></script>
 
@@ -39,9 +40,6 @@ border-color: #FA787E;
 
   </head>
   <body>
-    <div id="ruleList" ng-controller="ruleListCtrl as ruleList">
-      <div rule-panel id="ruleContainer" ng-repeat="rule in rules" class="panel" ng-class="{ 'panel-success':rule.rule_active === 1, 'panel-danger':rule.rule_active === 0}"></div>
-      <div rule-panel-create name="ruleContainerCreate" class="panel panel-default"></div>
-    </div>
+    <div rule-list id="ruleList"></div>
   </body>
 </html>

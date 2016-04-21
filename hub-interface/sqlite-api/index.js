@@ -369,7 +369,23 @@ restapi.get('/fieldIDName', function(req, res){
     });
 });
 
+restapi.get('/fieldIDNameCanSet', function(req, res){
+	console.log("GET /fieldIDName Returns an array of field ID and field name for field");
+	var sql = "SELECT field.field_id, field.field_name, device.device_name FROM field INNER JOIN device ON field.device_id=device.device_id WHERE field.field_can_set = 1";
+	//var sql = "select field_id,field_name from field";
+	console.log(sql);
 
+	db.all(sql, function(err, rows){
+		if (!err) {
+            console.log("Rules returned");
+            res.json(rows);
+        }
+        else {
+			console.log("Rules failed to return");
+			res.json({ message: 'Rules failed to return' });
+		}
+    });
+});
 
 restapi.listen(3000);
 

@@ -1,6 +1,6 @@
 <td class="col-md-3">
   <ol ng-show="actionCtrl.isEdit(1)" id="array-collection" class="nya-bs-select" ng-model="actionCtrl.editAction.field_id" style="width:100%" required>
-    <li nya-bs-option="option in fields group by option.device_name" data-value="option.field_id">
+    <li nya-bs-option="option in fieldsCanSet group by option.device_name" data-value="option.field_id">
       <span class="dropdown-header">{{$group}}</span>
       <a>
         {{option.field_name}}
