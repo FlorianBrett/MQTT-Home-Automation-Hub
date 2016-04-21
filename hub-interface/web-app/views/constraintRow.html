@@ -1,0 +1,31 @@
+<td class="col-md-3">
+  <span ng-show="constraintCtrl.isEdit(0)">{{constraint.field_id}}</span>
+  <ol ng-show="constraintCtrl.isEdit(1)" id="array-collection" class="nya-bs-select" ng-model="constraintCtrl.editConstraint.field_id" style="width:100%">
+    <li nya-bs-option="option in fields group by option.device_name" data-value="option.field_id">
+      <span class="dropdown-header">{{$group}}</span>
+      <a>
+        {{option.field_name}}
+      </a>
+    </li>
+  </ol>
+</td>
+<td class="col-md-3">
+  <span ng-show="constraintCtrl.isEdit(0)">{{constraint.constraint_operator}}</span>
+   <ol ng-show="constraintCtrl.isEdit(1)" id="array-collection" class="nya-bs-select" ng-model="constraintCtrl.editConstraint.constraint_operator" style="width:100%">
+    <li nya-bs-option="option in constraintOperators" data-value="option.id">
+      <a>
+        {{option.name}}
+      </a>
+    </li>
+  </ol>
+</td>
+<td class="col-md-3">
+  <span ng-show="constraintCtrl.isEdit(0)">{{constraint.constraint_value}}</span>
+  <input ng-show="constraintCtrl.isEdit(1)" class="form-control" style="width:100%" ng-model="constraintCtrl.editConstraint.constraint_value" type="number" required></input>
+</td>
+<td class="col-md-3">
+  <a href ng-show="constraintCtrl.isEdit(0)" ng-click="constraintCtrl.initEdit(constraint)"><span class="glyphicon glyphicon-pencil"></span>Edit</a>
+  <a href ng-show="constraintCtrl.isEdit(1)" ng-click="constraintCtrl.submitEdit(constraint)"><span class="glyphicon glyphicon-floppy-disk"></span>Save</a>
+  <a href ng-show="constraintCtrl.isEdit(1)" ng-click="constraintCtrl.setEdit(0)"><span class="glyphicon glyphicon-remove"></span>Cancel</a>
+  <a href ng-show="constraintCtrl.isEdit(0)" ng-click="constraintCtrl.deleteConstraint(constraint,constraints)"><span class="glyphicon glyphicon-remove"></span>Remove</a>
+</td>

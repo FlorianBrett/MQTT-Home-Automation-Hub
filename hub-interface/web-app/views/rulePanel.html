@@ -1,0 +1,79 @@
+        <div id="ruleHeader" class="panel-heading" style="overflow: auto">
+          <div id="viewTite" style="float:left">
+            <h4 ng-show="ruleCtrl.isEdit(0)" >{{rule.rule_name}}</h4>
+            <h4><input ng-show="ruleCtrl.isEdit(1)" ng-model="ruleCtrl.editRule.rule_name" type="text" style="margin:0px" required></input></h4>
+          </div>
+          <ul class="nav nav-pills" style="float:right">
+            <li ng-show="ruleCtrl.isExpand(1) && ruleCtrl.isEdit(0)" ><a href ng-click="ruleCtrl.initEdit(rule)"><span class="glyphicon glyphicon-pencil"></span>Edit</a></li>
+            <li ng-show="ruleCtrl.isExpand(1) && ruleCtrl.isEdit(1)" ><a href ng-click="ruleCtrl.submitEdit(rule)"><span class="glyphicon glyphicon-floppy-disk"></span>Save</a></li>
+            <li ng-show="ruleCtrl.isExpand(1) && ruleCtrl.isEdit(0)" ><a href ng-click="ruleCtrl.deleteRule(rule,rules)"><span class="glyphicon glyphicon-remove"></span>Delete</a></li>
+            <li ng-show="ruleCtrl.isExpand(1) && ruleCtrl.isEdit(1)" ><a href ng-click="ruleCtrl.setEdit(0)"><span class="glyphicon glyphicon-remove"></span>Cancel</a></li>
+
+            <li ng-show="ruleCtrl.isExpand(0)" ><a href ng-click="ruleCtrl.setExpand(1)"><span class="glyphicon glyphicon-menu-down"></span>Expand</a></li>
+            <li ng-show="ruleCtrl.isExpand(1)" ><a href ng-click="ruleCtrl.setExpand(0)"><span class="glyphicon glyphicon-menu-up"></span>Shrink</a></li>
+
+          </ul>
+        </div>
+        <div id="ruleBody" class="panel-body" ng-show="ruleCtrl.isExpand(1)" style="padding:0px">
+          <div id="ruleDescription" style="padding:10px 0px; overflow: auto">
+            <span class="col-sm-9">
+              <p ng-show="ruleCtrl.isEdit(0)">{{rule.rule_description}}</p>
+              <span ng-show="ruleCtrl.isEdit(1)">
+                <textarea ng-model="ruleCtrl.editRule.rule_description"  class="form-control"> </textarea>
+              </span>
+            </span>
+            <span class="col-sm-3">
+              <span ng-show="ruleCtrl.isEdit(0)">
+               <input bs-switch ng-model="rule.rule_active" switch-active="false" switch-on-text="Active" switch-off-text="Inactive" type="checkbox" ng-true-value="1" ng-false-value="0"></input>
+              </span>
+              <span ng-show="ruleCtrl.isEdit(1)">
+                <input bs-switch ng-model="ruleCtrl.editRule.rule_active" switch-on-text="Active" switch-off-text="Inactive" type="checkbox" ng-true-value="1" ng-false-value="0"></input>
+              </span>
+            </span>
+          </div>
+
+          <div class="col-sm-6" >
+            <div class="panel panel-default">
+              <div class="panel-heading ">
+                <h5>Constraints</h5>
+              </div>
+              <div class="panel-body" ng-controller="constraintListCtrl as constraintList" ng-init="constraintList.initConstraintList(rule)"> 
+                <table name="constraintsTable" class="table table-striped" style="font-size:14px">
+                  <thead>
+                    <tr>
+                      <th>Field</th>
+                      <th>Operator</th>
+                      <th>Value</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr constraint-row id="constraintContainer" ng-repeat="constraint in constraints" style="overflow: auto"></tr>
+                    <tr constraint-row-create id="createConstraint" ></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="panel panel-default" style="margin:0px">
+              <div class="panel-heading"><h5>Actions</h5></div>
+              <div class="panel-body" ng-controller="actionListCtrl as actionList" ng-init="actionList.initActionList(rule)">
+                <table name="constraintsTable" class="table table-striped" style="font-size:14px">
+                  <thead>
+                    <tr>
+                      <th>Field</th>
+                      <th>Operator</th>
+                      <th>Value</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr action-row id="actionContainer" ng-repeat="action in actions" style="overflow: auto"></tr>
+                    <tr action-row-create id="createAction" ></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>

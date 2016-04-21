@@ -1,0 +1,26 @@
+<div id="ruleHeader" class="panel-heading" style="overflow: auto">
+          <div id="viewTite" style="float:left">
+            <h4><input ng-show="ruleCtrl.isEdit(1)" ng-model="ruleCtrl.editRule.rule_name" type="text" style="margin:0px" required></input></h4>
+          </div>
+          <ul class="nav nav-pills" style="float:right">
+            <li ng-show="ruleCtrl.isEdit(0)" ><a href ng-click="ruleCtrl.initCreate()"><span class="glyphicon glyphicon-plus"></span>Create new rule</a></li>
+            <li ng-show="ruleCtrl.isEdit(1)" ><a href ng-click="ruleCtrl.submitCreate(rule,rules)"><span class="glyphicon glyphicon-floppy-disk"></span>Save</a></li>
+            <li ng-show="ruleCtrl.isEdit(1)" ><a href ng-click="ruleCtrl.setEdit(0)"><span class="glyphicon glyphicon-remove"></span>Cancel</a></li>
+
+
+          </ul>
+        </div>
+        <div id="ruleBody" class="panel-body" ng-show="ruleCtrl.isEdit(1)" style="padding:0px">
+          <div id="ruleDescription" style="padding:10px 0px; overflow: auto">
+            <span class="col-sm-9">
+              <span ng-show="ruleCtrl.isEdit(1)">
+                <textarea ng-model="ruleCtrl.editRule.rule_description"  class="form-control"> </textarea>
+              </span>
+            </span>
+            <span class="col-sm-3">
+              <span ng-show="ruleCtrl.isEdit(1)">
+                <input bs-switch ng-model="ruleCtrl.editRule.rule_active" switch-on-text="Active" switch-off-text="Inactive" type="checkbox" ng-true-value="1" ng-false-value="0"></input>
+              </span>
+            </span>
+          </div>
+        </div>

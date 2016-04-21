@@ -249,6 +249,128 @@ restapi.delete('/rules/:rule_id/constraints/:constraint_id', function(req, res){
 
 
 
+
+//POST /rules Creates a new action
+restapi.post('/rules/:rule_id/actions', function(req, res){
+	console.log("POST /rules Creates a new rule");
+	var sql = "INSERT INTO rule_action (rule_id,field_id,action_operator,action_value) VALUES (" + req.body.rule_id + ",'" + req.body.field_id + "','" + req.body.action_operator + "'," + req.body.action_value + ")";
+	console.log(sql);
+	//COULD RETURN NEW RULE OR JUST ID?
+	db.get(sql, function(err, data){
+        if (!err) {
+        	db.get("SELECT last_insert_rowid()", function(err, data){
+		        if (!err) {
+		        	console.log(data);
+		        	var action = req.body;
+		        	action.action_id = data['last_insert_rowid()'];
+		        	console.log(action);
+		        	res.json(action);
+		        	console.log("Rule inserted");
+		        }
+		        else {
+					console.log("Rule failed to insert");
+					res.json({ message: 'Rule failed to insert' });
+				}
+		    });
+        }
+        else {
+			console.log("Rule failed to insert");
+			res.json({ message: 'Rule failed to insert' });
+		}
+    });
+});
+
+//GET /rules/:rule_id/actions Returns all contraints for rule id
+restapi.get('/rules/:rule_id/actions', function(req, res){
+	console.log("GET /rules/:rule_id/actions Returns all contraints for rule id"+ req.params.rule_id);
+	var sql = "SELECT * FROM rule_action WHERE rule_id=" + req.params.rule_id;
+	console.log(sql);
+
+	db.all(sql, function(err, rows){
+		if (!err) {
+            console.log("Rules returned");
+            res.json(rows);
+        }
+        else {
+			console.log("Rules failed to return");
+			res.json({ message: 'Rules failed to return' });
+		}
+    });
+});
+
+//GET /rules/:rule_id Returns rule based on id
+restapi.get('/rules/:rule_id/actions/:action_id', function(req, res){
+	console.log("GET /rules/:rule_id Returns rule based on id:?",req.params.rule_id);
+	var sql = "SELECT * FROM rule WHERE rule_id=" + req.params.rule_id;
+	console.log(sql);
+
+	db.get(sql, function(err, row){
+		if (!err) {
+            console.log("Rule returned");
+            res.json(row);
+        }
+        else {
+			console.log("Rule failed to return");
+			res.json({ message: 'Rule failed to return' });
+		}
+    });
+});
+
+//PUT /rules Updates rule based on id
+restapi.put('/rules/:rule_id/actions/:action_id', function(req, res){
+	console.log("PUT /rules Updates rule based on id:?",req.params.rule_id);
+	var sql = "UPDATE rule_action SET field_id = '" + req.body.field_id + "', action_operator = '" + req.body.action_operator + "', action_value = " + req.body.action_value +" WHERE action_id=" + req.params.action_id;
+	console.log(sql);
+	db.run(sql, function(err, row){
+        if (!err){
+            console.log("Rule updated");
+            res.json({ message: 'Rule updated' });
+        } else {
+			console.log("Rule failed to update");
+			res.json({ message: 'Rule failed to update' });
+		}
+    });
+});
+
+//DELETE /rules deletes rule based on id
+restapi.delete('/rules/:rule_id/actions/:action_id', function(req, res){
+	console.log("DELETE /rules deletes rule based on id:?",req.params.action_id);
+	var sql = "DELETE FROM rule_action WHERE action_id=" + req.params.action_id;
+	console.log(sql);
+	db.run(sql, function(err, row){
+        if (!err){
+            console.log("Rule deleted");
+            res.json({ message: 'Rule deleted' });
+        } else {
+		console.log("Rule failed to delete");
+		res.json({ message: 'Rule failed to delete' });
+		}
+    });
+});
+
+
+
+//GET /fieldSelect Returns an array of field ID and field name for field
+restapi.get('/fieldIDName', function(req, res){
+	console.log("GET /fieldIDName Returns an array of field ID and field name for field");
+	var sql = "SELECT field.field_id, field.field_name, device.device_name FROM field INNER JOIN device ON field.device_id=device.device_id";
+	//var sql = "select field_id,field_name from field";
+	console.log(sql);
+
+	db.all(sql, function(err, rows){
+		if (!err) {
+            console.log("Rules returned");
+            res.json(rows);
+        }
+        else {
+			console.log("Rules failed to return");
+			res.json({ message: 'Rules failed to return' });
+		}
+    });
+});
+
+
+
 restapi.listen(3000);
 
 console.log("API started on http://localhost:3000");

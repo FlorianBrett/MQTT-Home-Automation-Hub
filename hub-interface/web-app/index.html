@@ -2,139 +2,46 @@
   <head>
   <script src="jquery-2.2.3.min.js"></script>
     <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="libs/bootstrap-3.3.6-dist/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 
-    <!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+    <!-- Optional theme 
+    <link rel="stylesheet" href="libs/bootstrap-3.3.6-dist/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous"> -->
 
     <!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <script src="libs/bootstrap-3.3.6-dist/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 
     <script src="angular.min.js"></script>
 
     <script src="app.js"></script>
-    <link href="dist/css/bootstrap3/bootstrap-switch.css" rel="stylesheet">
-    <script src="dist/js/bootstrap-switch.js"></script>
+    <script src="directives/constraintDirective.js"></script>
+    <script src="directives/actionDirective.js"></script>
+    <script src="directives/ruleDirective.js"></script>
+<link href="dist/css/nya-bs-select.css" rel="stylesheet">
+<script src="dist/js/nya-bs-select.js"></script>
+
+<script src="libs/bootstrap-switch"></script>
+<script src="libs/bootstrap-switch/js/bootstrap-switch.florian.js"></script>
+<link href="libs/bootstrap-switch/css/bootstrap3/bootstrap-switch.css" rel="stylesheet">
+
+<script src="angular-bootstrap-switch.js"></script>
+<style>
+.ng-invalid.ng-touched {
+border-color: #FA787E;
+}
+!
+.ng-valid.ng-touched {
+border-color: #78FA89;
+}
+.ng-invalid.ng-touched .btn{
+border-color: #FA787E;
+}
+</style>
 
   </head>
   <body>
-    <div id="ruleList" ng-controller="ruleListCtrl as ruleList" class="col-sm-8">
-      <div id="ruleContainer" ng-repeat="rule in rules" ng-controller="ruleNavCtrl as nav" class="panel" ng-class="{ 'panel-success':rule.rule_active === 1, 'panel-danger':rule.rule_active === 0}">
-        <div id="ruleHeader" class="panel-heading" style="overflow: auto">
-          <div id="viewTite">
-            <h4 style="float:left">{{rule.rule_name}}</h4>
-          </div>
-          <ul class="nav nav-pills" style="float:right">
-            <li ng-show="nav.isExpand(1)" ng-class="{ active:nav.isMode(1)}"><a href ng-click="nav.setMode(1)">View</a></li>
-            <li ng-show="nav.isExpand(1)" ng-class="{ active:nav.isMode(2)}"><a href ng-click="nav.setMode(2)"><span class="glyphicon glyphicon-pencil"></span>Edit</a></li>
-            <li><a href ng-show="nav.isExpand(1)" ng-controller="ruleDeleteCtrl as delete" ng-click="delete.deleteRule(rule,rules)"><span class="glyphicon glyphicon-remove"></span>Delete</a></li>
-
-            <li><a href ng-show="nav.isExpand(0)" ng-click="nav.setExpand(1)"><span class="glyphicon glyphicon-menu-down"></span>Expand</a></li>
-            <li><a href ng-show="nav.isExpand(1)" ng-click="nav.setExpand(0)"><span class="glyphicon glyphicon-menu-up"></span>Shrink</a></li>
-
-          </ul>
-        </div>
-        <div id="ruleBody" class="panel-body" ng-show="nav.isExpand(1)">
-          <div id="viewRule" ng-show="nav.isMode(1)">
-            <p>
-              {{rule.rule_id}}:{{rule.rule_description}}
-              <input  bootstrap-switch type="checkbox" ng-model="rule.rule_active" ng-true-value="1" ng-false-value="0" data-on-color="info" />
-            </p>
-          </div>
-          <div id="editRule" ng-show="nav.isMode(2)">
-            <form name="editForm" ng-controller="ruleEditCtrl as edit" ng-submit="edit.submitEdit(rule)" ng-init="edit.initEdit(rule)">
-              <input ng-model="edit.editRule.rule_name" type="text"></input>
-              <input ng-model="edit.editRule.rule_description" type="text"></input>
-              <input type="checkbox" ng-model="edit.editRule.rule_active" ng-true-value="1" ng-false-value="0" bootstrap-switch />
-              <input type="submit" ng-click="nav.setMode(1)" value="Submit"/>
-            </form>
-          </div>
-
-          <div class="col-sm-6" style="padding:0px">
-            <div class="panel panel-default" style="margin:0px">
-              <div class="panel-heading ">
-                <h5>Constraints</h5>
-              </div>
-              <div class="panel-body" ng-controller="constraintListCtrl as ruleList"> 
-                <div id="constraintContainer" ng-repeat="constraint in constraints" ng-controller="constraintCtrl as constraintCtrl" style="overflow: auto">
-                <div id ="viewConstraint" ng-show="constraintCtrl.isEdit(0)">
-                  <span class="col-sm-3" style="padding:0px">{{constraint.field_id}}</span>
-                  <span class="col-sm-3" style="padding:0px">{{constraint.constraint_operator}}</span>
-                  <span class="col-sm-3" style="padding:0px">{{constraint.constraint_value}}</span>
-                </div>
-                 <div id ="editConstraint" ng-show="constraintCtrl.isEdit(1)">
-                  <span class="col-sm-3" style="padding:0px"><input style="width:100%" ng-model="constraintCtrl.editConstraint.field_id" type="text"></input></span>
-                  <span class="col-sm-3" style="padding:0px"><input style="width:100%" ng-model="constraintCtrl.editConstraint.constraint_operator" type="text"></input></span>
-                  <span class="col-sm-3" style="padding:0px"><input style="width:100%" ng-model="constraintCtrl.editConstraint.constraint_value" type="text"></input></span>
-                </div>               
-
-                <span class="col-sm-3" style="padding:0px">
-                &nbsp;
-                  <a href ng-show="constraintCtrl.isEdit(0)" ng-click="constraintCtrl.initEdit(constraint)"><span class="glyphicon glyphicon-pencil"></span>edit</a>
-                  <a href ng-show="constraintCtrl.isEdit(1)" ng-click="constraintCtrl.submitEdit(constraint)"><span class="glyphicon glyphicon-floppy-disk"></span>save</a>
-                  <a href ng-show="constraintCtrl.isEdit(1)" ng-click="constraintCtrl.setEdit(0)"><span class="glyphicon glyphicon-remove"></span>cancel</a>
-                  <a href ng-show="constraintCtrl.isEdit(0)" ng-click="constraintCtrl.deleteConstraint(constraint,constraints)"><span class="glyphicon glyphicon-remove"></span>remove</a>
-
-                </span>
-                <hr class="divider" >
-                </div>
-
-                <div id="createConstraintContainer" ng-controller="constraintCtrl as constraintCtrl" style="overflow: auto">
-                <div id ="viewConstraint" ng-show="constraintCtrl.isEdit(0)">
-                  <span class="col-sm-9" style="padding:0px"></span>
-                </div>
-                 <div id ="editConstraint" ng-show="constraintCtrl.isEdit(1)">
-                  <span class="col-sm-3" style="padding:0px"><input style="width:100%" ng-model="constraintCtrl.editConstraint.field_id" type="text"></input></span>
-                  <span class="col-sm-3" style="padding:0px"><input style="width:100%" ng-model="constraintCtrl.editConstraint.constraint_operator" type="text"></input></span>
-                  <span class="col-sm-3" style="padding:0px"><input style="width:100%" ng-model="constraintCtrl.editConstraint.constraint_value" type="text"></input></span>
-                </div>               
-
-                <span class="col-sm-3" style="padding:0px">
-                &nbsp;
-                  <a href ng-show="constraintCtrl.isEdit(0)" ng-click="constraintCtrl.initCreate()"><span class="glyphicon glyphicon-plus"></span>New Constraint</a>
-                  <a href ng-show="constraintCtrl.isEdit(1)" ng-click="constraintCtrl.createConstraint(rule,constraint,constraints)"><span class="glyphicon glyphicon-floppy-disk"></span>save
-                  <a href ng-show="constraintCtrl.isEdit(1)" ng-click="constraintCtrl.setEdit(0)"><span class="glyphicon glyphicon-remove"></span>cancel</a>
-
-                </span>
-                </div>
-
-
-
-              </div>
-            </div>
-          </div>
-          <div class="col-sm-6" style="padding:0px">
-            <div class="panel panel-default" style="margin:0px">
-              <div class="panel-heading"><h5>Actions</h5></div>
-              <div class="panel-body">Panel Content</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div id="ruleContainer" ng-controller="ruleNavCtrl as nav" class="panel panel-default">
-        <div id="ruleHeader" class="panel-heading" style="overflow: auto">
-          <div id="viewTite">
-            <h4 style="float:left">{{rule.rule_name}}</h4>
-          </div>
-          <ul class="nav nav-pills" style="float:right">
-            <li ng-class="{ active:nav.isMode(2)}" ng-show="nav.isMode(1)"><a href ng-click="nav.setMode(2)"><span class="glyphicon glyphicon-plus"></span>Create new rule</a></li>
-            <li ng-class="{ active:nav.isMode(1)}" ng-show="nav.isMode(2)" ><a href ng-click="nav.setMode(1)"><span class="glyphicon glyphicon-floppy-disk"></span>Save</a></li>
-            <li ng-class="{ active:nav.isMode(1)}" ng-show="nav.isMode(2)" ><a href ng-click="nav.setMode(1)"><span class="glyphicon glyphicon-remove"></span>Cancel</a></li>
-          </ul>
-        </div>
-        <div id="ruleBody" class="panel-body" ng-show="nav.isMode(2)">
-          <div id="editRule" >
-            <form name="editForm" ng-controller="ruleCreateCtrl as edit" ng-submit="edit.submitEdit(rule,rules)" ng-init="edit.initEdit()">
-              <input ng-model="edit.editRule.rule_name" type="text"></input>
-              <input ng-model="edit.editRule.rule_description" type="text"></input>
-              <input type="checkbox" ng-model="edit.editRule.rule_active" ng-true-value="1" ng-false-value="0" bootstrap-switch />
-              <input type="submit" ng-click="nav.setMode(1)"value="Submit"/>
-            </form>
-          </div>
-        </div>
-      </div>
-
+    <div id="ruleList" ng-controller="ruleListCtrl as ruleList">
+      <div rule-panel id="ruleContainer" ng-repeat="rule in rules" class="panel" ng-class="{ 'panel-success':rule.rule_active === 1, 'panel-danger':rule.rule_active === 0}"></div>
+      <div rule-panel-create name="ruleContainerCreate" class="panel panel-default"></div>
     </div>
   </body>
 </html>

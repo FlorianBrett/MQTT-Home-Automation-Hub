@@ -1,0 +1,31 @@
+<td class="col-md-3">
+  <span ng-show="actionCtrl.isEdit(0)">{{action.field_id}}</span>
+  <ol ng-show="actionCtrl.isEdit(1)" id="array-collection" class="nya-bs-select" ng-model="actionCtrl.editAction.field_id" style="width:100%">
+    <li nya-bs-option="option in fields group by option.device_name" data-value="option.field_id">
+      <span class="dropdown-header">{{$group}}</span>
+      <a>
+        {{option.field_name}}
+      </a>
+    </li>
+  </ol>
+</td>
+<td class="col-md-3">
+  <span ng-show="actionCtrl.isEdit(0)">{{action.action_operator}}</span>
+   <ol ng-show="actionCtrl.isEdit(1)" id="array-collection" class="nya-bs-select" ng-model="actionCtrl.editAction.action_operator" style="width:100%">
+    <li nya-bs-option="option in actionOperators" data-value="option.id">
+      <a>
+        {{option.name}}
+      </a>
+    </li>
+  </ol>
+</td>
+<td class="col-md-3">
+  <span ng-show="actionCtrl.isEdit(0)">{{action.action_value}}</span>
+  <input ng-show="actionCtrl.isEdit(1)" class="form-control" style="width:100%" ng-model="actionCtrl.editAction.action_value" type="number" required></input>
+</td>
+<td class="col-md-3">
+  <a href ng-show="actionCtrl.isEdit(0)" ng-click="actionCtrl.initEdit(action)"><span class="glyphicon glyphicon-pencil"></span>Edit</a>
+  <a href ng-show="actionCtrl.isEdit(1)" ng-click="actionCtrl.submitEdit(action)"><span class="glyphicon glyphicon-floppy-disk"></span>Save</a>
+  <a href ng-show="actionCtrl.isEdit(1)" ng-click="actionCtrl.setEdit(0)"><span class="glyphicon glyphicon-remove"></span>Cancel</a>
+  <a href ng-show="actionCtrl.isEdit(0)" ng-click="actionCtrl.deleteAction(action,actions)"><span class="glyphicon glyphicon-remove"></span>Remove</a>
+</td>
