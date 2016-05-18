@@ -1,45 +1,103 @@
 <html ng-app="ruleApp">
-  <head>
-  <script src="jquery-2.2.3.min.js"></script>
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="libs/bootstrap-3.3.6-dist/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	 <head>
 
-    <!-- Optional theme 
-    <link rel="stylesheet" href="libs/bootstrap-3.3.6-dist/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous"> -->
+		<script src="libs/jquery/jquery-2.2.3.min.js"></script>
 
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="libs/bootstrap-3.3.6-dist/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+		<script src="libs/angular-1.5.5/angular.min.js"></script>
 
-    <script src="angular.min.js"></script>
+		<link href="libs/nya-bs-select/css/nya-bs-select.css" rel="stylesheet">
+		<script src="libs/nya-bs-select/js/nya-bs-select.js"></script>
 
-    <script src="app.js"></script>
-    <script src="directives/constraintDirective.js"></script>
-    <script src="directives/actionDirective.js"></script>
-    <script src="directives/ruleDirective.js"></script>
+		<script src="libs/bootstrap-switch/js/bootstrap-switch.florian.js"></script>
+		<link href="libs/bootstrap-switch/css/bootstrap3/bootstrap-switch.css" rel="stylesheet">
 
-<link href="dist/css/nya-bs-select.css" rel="stylesheet">
-<script src="dist/js/nya-bs-select.js"></script>
+		<script src="libs/angular-bootstrap-switch/angular-bootstrap-switch.js"></script>
 
-<script src="libs/bootstrap-switch"></script>
-<script src="libs/bootstrap-switch/js/bootstrap-switch.florian.js"></script>
-<link href="libs/bootstrap-switch/css/bootstrap3/bootstrap-switch.css" rel="stylesheet">
+		<script src="libs/bootstrap-3.3.6-dist/css/bootstrap.min.js"></script>
+		<link href="libs/bootstrap-3.3.6-dist/css/bootstrap.min.css" rel="stylesheet" >
 
-<script src="angular-bootstrap-switch.js"></script>
-<style>
-.ng-invalid.ng-touched {
-border-color: #FA787E;
-}
-!
-.ng-valid.ng-touched {
-border-color: #78FA89;
-}
-.ng-invalid.ng-touched .btn{
-border-color: #FA787E;
-}
-</style>
+		<script src="libs/angularjs-slider/rzslider.min.js"></script>
+		<link href="libs/angularjs-slider/rzslider.min.css" rel="stylesheet" >
 
-  </head>
+		<script src="libs/angular-ui/angular-ui-router.js"></script>
+		
+		<script src="libs/paho-mqtt-javascript/mqttws31.js"></script>
+
+		<script src="app.js"></script>
+		<script src="directives/constraintDirective.js"></script>
+		<script src="directives/actionDirective.js"></script>
+		<script src="directives/ruleDirective.js"></script>
+		<script src="directives/ruleEditorPageDirective.js"></script>
+		<script src="directives/overviewPageDirective.js"></script>
+		<script src="directives/settingsPageDirective.js"></script>			
+		<script src="directives/liveFieldPageDirective.js"></script>		
+
+		    <link href="dashboard.css" rel="stylesheet">
+		<style>
+			.ng-invalid.ng-touched {
+			border-color: #FA787E;
+			}
+			!
+			.ng-valid.ng-touched {
+			border-color: #78FA89;
+			}
+			.ng-invalid.ng-touched .btn{
+			border-color: #FA787E;
+			}
+
+			.settings-form label {
+				width:150px;
+				text-align: right;
+				margin-right: 20px;
+			}
+
+
+		</style>
+
+	 </head>
   <body>
-    <div rule-list id="ruleList"></div>
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">SmartRule Hub</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="#">Dashboard</a></li>
+            <li><a href="#">Settings</a></li>
+            <li><a href="#">Log</a></li>
+            <li><a href="#">Documentation</a></li>
+            <li><a href="#">Help</a></li>
+          </ul>
+          <form class="navbar-form navbar-right">
+            <input type="text" class="form-control" placeholder="Search...">
+          </form>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="col-sm-3 col-md-2 sidebar">
+          <ul class="nav nav-sidebar">
+            <li><a ui-sref="overview">Overview</a></li>
+            <li><a ui-sref="live">Live field state</a></li>
+            <!--<li><a href="#">Field state history</a></li>-->
+            <li><a ui-sref="ruleEditor">Rule Editor</a></li>
+            <!---<li><a href="#">Rule History</a></li>-->
+            <li><a ui-sref="settings">Settings</a></li>
+          </ul>
+        </div>
+    </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <div ui-view></div>
+
+        </div>
+    </div>
   </body>
 </html>

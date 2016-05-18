@@ -1,0 +1,124 @@
+<h1 class="page-header">Settings</h1>
+
+<div class="panel panel-default">
+	<div class="panel-heading">MQTT Settings</div>
+	<div class="panel-body">
+		<p>MQTT settings can be used to change the MQTT broker used by the rule engine and interface.<br />
+			(Note the rule-engine requires a restart before mqtt changes are implemented.)</p>
+
+			<form class="form-horizontal" ng-submit="settingsCtrl.submitMQTT()" style="max-width: 600px;">
+				<div class="form-group">
+					<label for="mqttAddress" class="col-sm-4 control-label">MQTT Address</label>
+					<div class="col-sm-8">
+						<input id="mqttAddress" type="text" ng-model="mqttAddress.value" class="form-control" required>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="mqttUsername" class="col-sm-4 control-label">MQTT Username</label>
+					<div class="col-sm-8">
+						<input id="mqttUsername" type="text" ng-model="mqttUsername.value" class="form-control" required>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="mqttPassword" class="col-sm-4 control-label">MQTT Password</label>
+					<div class="col-sm-8">
+						<input id="mqttPassword" type="text" ng-model="mqttPassword.value" class="form-control" required>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="mqttClientId" class="col-sm-4 control-label">MQTT Client ID</label>
+					<div class="col-sm-8">
+						<input id="mqttClientId" type="text" ng-model="mqttClientId.value" class="form-control" required>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-offset-4 col-sm-8">
+						<button type="submit" class="btn btn-default">Save Changes</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<div class="panel panel-default">
+	<div class="panel-heading">Logging Settings</div>
+	<div class="panel-body">
+		<p>Logging setting change amount logged to the rule engines terminal and to file<br />
+			The system will log the chosen severity and above.<br />
+			Changes can take up to a minute to take effect.
+			</p>
+
+			<form class="form-horizontal" ng-submit="settingsCtrl.submitLogging()" style="max-width: 600px;">
+				<div class="form-group">
+					<label for="loggingGlobal" class="col-sm-4 control-label">Global</label>
+					<div class="col-sm-8">
+					 	<rzslider id="loggingGlobal" rz-slider-model="loggingGlobal" rz-slider-options="sliderOptions"></rzslider>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="loggingDB" class="col-sm-4 control-label">Database</label>
+					<div class="col-sm-8">
+						<rzslider id="loggingDB" rz-slider-model="loggingDB" rz-slider-options="sliderOptions"></rzslider>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="loggingRule" class="col-sm-4 control-label">Rule</label>
+					<div class="col-sm-8">
+						<rzslider id="loggingRule" rz-slider-model="loggingRule" rz-slider-options="sliderOptions"></rzslider>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="loggingTimer" class="col-sm-4 control-label">Timer</label>
+					<div class="col-sm-8">
+						<rzslider id="loggingTimer" rz-slider-model="loggingTimer" rz-slider-options="sliderOptions"></rzslider>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="loggingMQTT" class="col-sm-4 control-label">MQTT</label>
+					<div class="col-sm-8">
+						<rzslider id="loggingMQTT" rz-slider-model="loggingMQTT" rz-slider-options="sliderOptions"></rzslider>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-offset-4 col-sm-8">
+						<button type="submit" class="btn btn-default">Save Changes</button>
+					</div>
+				</div>
+
+			</form>
+		</div>
+	</div>
+</div>
+
+
+<div class="panel panel-default">
+	<div class="panel-heading">History Settings</div>
+	<div class="panel-body">
+		<p>Turning on history will give you the ability to look back when field states are changing or rules are firing. <br />
+		Note storing history will reduce performance slightly however in most cases this is unnoticeable.
+			</p>
+
+			<form class="form-horizontal" ng-submit="settingsCtrl.submitHistory()" style="max-width: 600px;">
+				<div class="form-group">
+					<label for="loggingGlobal" class="col-sm-4 control-label">State Change</label>
+					<div class="col-sm-8">
+					 	<input bs-switch ng-model="stateHistory" type="checkbox" ng-true-value="1" ng-false-value="0"></input>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="loggingDB" class="col-sm-4 control-label">Rules Firing</label>
+					<div class="col-sm-8">
+						<input bs-switch ng-model="ruleHistory" switch-active="false" type="checkbox" ng-true-value="1" ng-false-value="0"></input>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-offset-4 col-sm-8">
+						<button type="submit" class="btn btn-default">Save Changes</button>
+					</div>
+				</div>
+
+			</form>
+		</div>
+	</div>
+</div>

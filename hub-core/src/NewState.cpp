@@ -14,10 +14,11 @@
 #include "Rule.h"
 #include "MQTTMessageBuffer.h"
 #include "spdlog/spdlog.h"
+#include "DBHandlerMYSQL.h"
 
 bool NewState::checkStateChange() {
 	bool stateChanged = false;
-	DBHandler db;
+	DBHandlerMYSQL db;
 	std::string originalValue = db.getStateValue(device,field);
 	logger->debug() <<"Comparing: '" << value << "' AND '" << originalValue << "'";
 	if (value.compare(originalValue) != 0)
@@ -43,7 +44,7 @@ NewState::NewState(MQTTMessage inMessage,MQTTMessageBuffer *outBufferPointer) {
 
 	if (checkStateChange() == true)
 	{
-		DBHandler db;
+		DBHandlerMYSQL db;
 		db.setStateValue(device,field,value);
 		std::vector<std::string> ruleIDs = db.getRuleIDs(device,field);
 

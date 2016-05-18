@@ -15,6 +15,7 @@
 #include <unistd.h>
 #include "DBHandler.h"
 #include "spdlog/spdlog.h"
+#include "DBHandlerMYSQL.h"
 RuleTimer::RuleTimer(int inSleepTime,RuleBuffer *ruleBufferPointer,MQTTMessageBuffer *outBufferPointer) {
 	logger = spdlog::get("TIMER");
 	normalSleepTime = inSleepTime;
@@ -27,7 +28,7 @@ void RuleTimer::startTimer(){
 
 	while(true)
 	{
-		int sleepTime = 10;
+		int sleepTime = normalSleepTime;
 		//GET TIME
 		time_t currentTime;
 		struct tm *timeData;
@@ -45,7 +46,7 @@ void RuleTimer::startTimer(){
 			ruleTimes.pop_back();
 		}
 
-		DBHandler db;
+		DBHandlerMYSQL db;
 		ruleTimes = db.getTimerRules(secondsOfDay + 1,secondsOfDay + sleepTime);
 		db.closeDB();
 		if (ruleTimes.size() > 0)
@@ -59,8 +60,8 @@ void RuleTimer::startTimer(){
 		{
 			logger->trace() << "New day calculation fix";
 			sleepTime = (24 * 60 * 60) - secondsOfDay;
-			DBHandler db;
-			ruleTimes = db.getTimerRules(0,sleepTime);
+			DBHandlerMYSQL db;
+			ruleTimes = db.getTimerRules(0,normalSleepTime);
 			db.closeDB();
 		}
 		logger->trace() << "Sleeping for:" << sleepTime << " Seconds";

@@ -8,8 +8,9 @@
 #include "Constraint.h"
 #include <string>
 #include <iostream>
+#include "DBHandlerMYSQL.h"
 Constraint::Constraint(std::string constraintID) {
-	DBHandler db;
+	DBHandlerMYSQL db;
 	std::vector<std::string> constraint = db.getConstraint(constraintID);
 	db.closeDB();
 	deviceID = constraint[0];
@@ -20,7 +21,7 @@ Constraint::Constraint(std::string constraintID) {
 bool Constraint::resolveConstraint() {
 
 	bool resolution = false;
-	DBHandler db;
+	DBHandlerMYSQL db;
 	std::string fieldValue = db.getStateValue(deviceID,fieldID);
 	db.closeDB();
 	if (constraintOperator.compare("=") == 0) {

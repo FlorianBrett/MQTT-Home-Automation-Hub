@@ -9,9 +9,10 @@
 #include "MQTTMessageBuffer.h"
 #include <string>
 #include <iostream>
+#include "DBHandlerMYSQL.h"
 //#include "MQTTMessage.h"
 Action::Action(std::string actionID) {
-	DBHandler db;
+	DBHandlerMYSQL db;
 	std::vector<std::string> action = db.getAction(actionID);
 	db.closeDB();
 	deviceID = action[0];
@@ -21,7 +22,7 @@ Action::Action(std::string actionID) {
 }
 void Action::commitAction(MQTTMessageBuffer *outBufferPointer)
 {
-	DBHandler db;
+	DBHandlerMYSQL db;
 	std::string fieldValue = db.getStateValue(deviceID,fieldID);
 	db.closeDB();
 	std::string topic = "/" + deviceID + "/" + fieldID;

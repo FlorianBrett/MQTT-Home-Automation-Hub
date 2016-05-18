@@ -1,0 +1,80 @@
+<h1 class="page-header">Overview</h1>
+<div class="col-md-3">
+	<div class="well">
+		<p>Rule Count</p> <p style="font-size:30px; font-weight: bold;">{{ruleCount}}</p>
+		<p>Active Rule Count</p> <p style="font-size:30px; font-weight: bold;">{{ruleActiveCount}}</p>
+	</div>
+</div>
+<div class="col-md-3">
+	<div class="well">
+		<p>Device Count</p> <p style="font-size:30px; font-weight: bold;">{{deviceCount}}</p>
+		<p>Field Count</p> <p style="font-size:30px; font-weight: bold;">{{fieldCount}}</p>
+	</div>
+</div>
+<div class="col-md-3">
+	<div class="well">
+		<p>Rules fired today</p> <p style="font-size:30px; font-weight: bold;">{{dayRuleHistoryCount}}</p>
+		<p>Rules fired this week</p> <p style="font-size:30px; font-weight: bold;">{{weekRuleHistoryCount}}</p>
+		<p>Rules fired this month</p> <p style="font-size:30px; font-weight: bold;">{{monthRuleHistoryCount}}</p>
+	</div>
+</div>
+<div class="col-md-3">
+	<div class="well">
+		<p>State changes today</p> <p style="font-size:30px; font-weight: bold;">{{dayStateHistoryCount}}</p>
+		<p>State changes this week</p> <p style="font-size:30px; font-weight: bold;">{{weekStateHistoryCount}}</p>
+		<p>State changes this month</p> <p style="font-size:30px; font-weight: bold;">{{monthStateHistoryCount}}</p>
+	</div>
+</div>
+
+<div class="col-md-3">
+	<div class="well">
+	<h3>Recent rule fires</h3>
+	  <table class="table table-striped">
+	    <thead>
+	      <tr>
+	        <th>Time</th>
+	        <th>Rule Name</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	    <tbody>
+	      <tr ng-repeat="rule in ruleHistory">
+	        <td>{{rule.rule_history_time}}</td>
+	        <td>{{rule.rule_name}}</td>
+	      </tr>
+	    </tbody>
+	  </table>
+	</div>
+</div>
+<div class="col-md-4">
+	<div class="well">
+	<h3>Recent state changes</h3>
+	  <table class="table table-striped">
+	    <thead>
+	      <tr>
+	        <th>Time</th>
+	        <th>Device</th>
+	        <th>Field</th>
+	        <th>Value</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr ng-repeat="state in stateHistory">
+	        <td>{{state.state_time}}</td>
+	        <td>{{state.device_id}}</td>
+	        <td>{{state.field_id}}</td>
+	        <td>{{state.state_value}}</td>
+	      </tr>
+	    </tbody>
+	  </table>
+	</div>
+</div>
+
+<!--
+<div class="col-md-5">
+
+	<div class="well">
+	<h3>Graph</h3>
+	 <img src="http://www.bbc.co.uk/staticarchive/d952b4abb2a9af3e8f001f7af8afaecfa7a4e4ae.gif" width="100%"> 
+	</div>
+</div>-->

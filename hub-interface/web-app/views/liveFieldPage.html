@@ -1,0 +1,11 @@
+<h1 class="page-header">Live Field</h1>
+<div class="col-md-4" ng-repeat="field in fields">
+
+	<div ng-switch on="field.field_type" class="well">
+		<label class="control-label">{{field.field_name}}</label>
+		<input ng-switch-when="bool" bs-switch ng-model="field.field_value" switch-change="fieldChange(field)" type="checkbox" ng-true-value="1" ng-false-value="0"></input>
+		<input class="form-control" ng-switch-when="varible" ng-model="field.field_value" ng-change="fieldChange(field)" type="number" style="width:200px"></input>
+		<div ng-switch-when="button">Button</div>
+	</div>
+</div>
+<!--{{fields}}-->

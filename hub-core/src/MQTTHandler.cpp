@@ -13,6 +13,7 @@
 #include "stdlib.h"
 #include <iostream>
 #include "DBHandler.h"
+#include "DBHandlerMYSQL.h"
 //C Includes
 extern "C" {
 #include "MQTTAsync.h"
@@ -129,38 +130,38 @@ void MQTTHandler::publishMessage(MQTTMessage message)
 }
 MQTTHandler::MQTTHandler(MQTTMessageBuffer *inBufferPointer, MQTTMessageBuffer *outBufferPointer) {
 
-	DBHandler db;
-	const char* address = db.selectConfig("mqtt_address");
+	DBHandlerMYSQL db;
 
-	const char* clientID = db.selectConfig("mqtt_client_id");
-	const char* username = db.selectConfig("mqtt_username");
-	const char* password = db.selectConfig("mqtt_password");
+	std::string address = db.loadConfig("mqtt_address");
+	std::string password = db.loadConfig("mqtt_password");
+	std::string clientID = db.loadConfig("mqtt_client_id");
+	std::string username = db.loadConfig("mqtt_username");
 
-	//db.~DBHandler();
 	db.closeDB();
 
+	const char* addressChar = address.c_str();
+	const char* passwordChar = password.c_str();
+	const char* clientIDChar = clientID.c_str();
+	const char* usernameChar = username.c_str();
 
 	inBuffer = inBufferPointer;
 	outBuffer = outBufferPointer;
 
 	MQTTAsync_connectOptions conn_opts = MQTTAsync_connectOptions_initializer;
-	MQTTAsync_message pubmsg = MQTTAsync_message_initializer;
-	MQTTAsync_token token;
 	int rc;
 
-	MQTTAsync_create(&client, address, clientID , MQTTCLIENT_PERSISTENCE_NONE, NULL);
+	MQTTAsync_create(&client, addressChar, clientIDChar , MQTTCLIENT_PERSISTENCE_NONE, NULL);
 	MQTTAsync_setCallbacks(client, NULL, &cb_ConnectionLost, *cb_MessageArrived, NULL);
 	conn_opts.context = client;
-	conn_opts.username = username;
-	conn_opts.password = password;
-	//conn_opts.username = USERNAME;
-	//conn_opts.password = PASSWORD;
+	conn_opts.username = usernameChar;
+	conn_opts.password = passwordChar;
+
 	conn_opts.keepAliveInterval = 20;
 	conn_opts.cleansession = 1;
 
 	conn_opts.onSuccess = cb_ConnectSuccess;
 	conn_opts.onFailure = cb_ConnectFailure;
-	//std::cout << "Connecting to MQTT broker: " << std::string(address) << "\n";
+
 	if ((rc = MQTTAsync_connect(client, &conn_opts)) != MQTTASYNC_SUCCESS)
 	{
 		printf("Failed to start connect, return code %d\n", rc);

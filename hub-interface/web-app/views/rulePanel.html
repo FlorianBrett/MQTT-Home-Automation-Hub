@@ -10,7 +10,7 @@
             <li ng-show="ruleCtrl.isExpand(1) && ruleCtrl.isEdit(1)" ><a href ng-click="ruleCtrl.setEdit(0)"><span class="glyphicon glyphicon-remove"></span>Cancel</a></li>
 
             <li ng-show="ruleCtrl.isExpand(0)" ><a href ng-click="ruleCtrl.setExpand(1)"><span class="glyphicon glyphicon-menu-down"></span>Expand</a></li>
-            <li ng-show="ruleCtrl.isExpand(1)" ><a href ng-click="ruleCtrl.setExpand(0)"><span class="glyphicon glyphicon-menu-up"></span>Shrink</a></li>
+            <li ng-show="ruleCtrl.isExpand(1)" ><a href ng-click="ruleCtrl.setExpand(0); ruleCtrl.setEdit(0)"><span class="glyphicon glyphicon-menu-up"></span>Shrink</a></li>
 
           </ul>
         </div>

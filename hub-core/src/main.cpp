@@ -16,6 +16,7 @@
 #include "MQTTMessage.h"
 #include "sqlite3.h"
 #include "DBHandler.h"
+#include "DBHandlerMYSQL.h"
 #include "NewState.h"
 #include <fstream>
 #include "RuleTimer.h"
@@ -52,8 +53,19 @@ int main(int argc, char* argv[])
 		sqlString += str;
 		sqlString += " ";
 	}
-	DBHandler db;
-	db.sqlExec(sqlString);
+
+
+
+	DBHandlerMYSQL db;
+
+
+	db.getRuleIDs("esp1","led1");
+	db.setStateValue("esp1","led1","1");
+	std::cout << db.getStateValue("esp1","led1") << "\n";
+	db.setStateValue("esp1","led1","0");
+	std::cout << db.getStateValue("esp1","led1") << "\n";
+	//db.sqlExec(sqlString);
+
 	//should update more regularly
 	int globalLoggingLevel = atoi(db.loadConfig("global_logging_level").c_str());
 	logger->set_level(spdlog::level::level_enum(globalLoggingLevel));
@@ -77,9 +89,9 @@ int main(int argc, char* argv[])
 	RuleBuffer ruleBuffer(100);
 
 	MQTTHandler mqttInstance{&inBuffer,&outBuffer};
-	std::thread PublishThread(&MQTTHandler::publishOutBuffer,&mqttInstance);
-
 	RuleTimer time(10,&ruleBuffer,&outBuffer);
+
+	std::thread PublishThread(&MQTTHandler::publishOutBuffer,&mqttInstance);
 	std::thread TimerFireThread(&RuleTimer::startTimer,&time);
 	std::thread RuleBufferResolutionThread(&RuleTimer::ruleBufferResolution,&time);
 

@@ -29,6 +29,7 @@ public:
 	std::string getStateValue(std::string device,std::string field);
 	void setStateValue(std::string device,std::string field,std::string value);
 	void addStateHistory(std::string device,std::string field,std::string value);
+	void addRuleHistory(std::string ruleID);
 	std::vector<std::string> getRuleIDs(std::string device,std::string field);
 	std::vector<std::string> getConstraintIDs(std::string ruleID);
 	std::vector<std::string> getConstraint(std::string constraintID);

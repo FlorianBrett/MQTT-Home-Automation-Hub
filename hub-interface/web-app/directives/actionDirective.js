@@ -33,7 +33,7 @@
 						action.action_operator = this.editAction.action_operator;
 						action.action_value = this.editAction.action_value;
 						console.log(action);
-						$http.put('http:/localhost:3000/rules' + '/' + action.rule_id + '/actions/' + action.action_id , action)
+						$http.put('http://192.168.1.30:3000/rules' + '/' + action.rule_id + '/actions/' + action.action_id , action)
 						this.setEdit(0);
 					}
 					else
@@ -45,7 +45,7 @@
 				//delete action
 				this.deleteAction = function (action,actions) {
 					console.log(action);
-					$http.delete('http:/localhost:3000/rules' + '/' + action.rule_id + '/actions/' + action.action_id);
+					$http.delete('http://192.168.1.30:3000/rules' + '/' + action.rule_id + '/actions/' + action.action_id);
 					index = actions.findIndex(x => x.action_id==action.action_id);
 					console.log(index);
 					actions.splice (index, 1);
@@ -90,7 +90,7 @@
 						action.action_operator = this.editAction.action_operator;
 						action.action_value = this.editAction.action_value;
 						console.log(action);
-						$http.post('http:/localhost:3000/rules' + '/' + action.rule_id + '/actions' , action).success(function(data){
+						$http.post('http://192.168.1.30:3000/rules' + '/' + action.rule_id + '/actions' , action).success(function(data){
 							console.log(data);
 							actions.push(data);
 						});

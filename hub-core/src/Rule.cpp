@@ -13,11 +13,12 @@
 #include <vector>
 #include <iostream>
 #include "spdlog/spdlog.h"
+#include "DBHandlerMYSQL.h"
 Rule::Rule(std::string inRuleID) {
 	ruleID=inRuleID;
 }
 void Rule::loadRule() {
-	DBHandler db;
+	DBHandlerMYSQL db;
 	std::vector<std::string> constraintIDs = db.getConstraintIDs(ruleID);
 	std::vector<std::string> actionIDs = db.getActionIDs(ruleID);
 	db.closeDB();
@@ -37,10 +38,16 @@ bool Rule::resolveRule() {
 		if(it->resolveConstraint() == false)
 		{
 			resolution = false;
+			break;
 		}
 	}
-	if (resolution == true)
+	if (resolution == true) {
+		DBHandlerMYSQL db;
 		logger->info() << "Rule" << ruleID  << ": resolved TRUE";
+		if(db.loadConfig("rule_history").compare("1") == 0)
+			db.addRuleHistory(ruleID);
+		db.closeDB();
+	}
 	else
 		logger->info() << "Rule" << ruleID  << ": resolved FALSE";
 	return resolution;

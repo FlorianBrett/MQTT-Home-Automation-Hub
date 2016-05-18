@@ -33,7 +33,7 @@
 						constraint.constraint_operator = this.editConstraint.constraint_operator;
 						constraint.constraint_value = this.editConstraint.constraint_value;
 						console.log(constraint);
-						$http.put('http:/localhost:3000/rules' + '/' + constraint.rule_id + '/constraints/' + constraint.constraint_id , constraint)
+						$http.put('http://192.168.1.30:3000/rules' + '/' + constraint.rule_id + '/constraints/' + constraint.constraint_id , constraint)
 						this.setEdit(0);
 					}
 					else
@@ -45,7 +45,7 @@
 				//delete constraint
 				this.deleteConstraint = function (constraint,constraints) {
 					console.log(constraint);
-					$http.delete('http:/localhost:3000/rules' + '/' + constraint.rule_id + '/constraints/' + constraint.constraint_id);
+					$http.delete('http://192.168.1.30:3000/rules' + '/' + constraint.rule_id + '/constraints/' + constraint.constraint_id);
 					index = constraints.findIndex(x => x.constraint_id==constraint.constraint_id);
 					console.log(index);
 					constraints.splice (index, 1);
@@ -90,7 +90,7 @@
 						constraint.constraint_operator = this.editConstraint.constraint_operator;
 						constraint.constraint_value = this.editConstraint.constraint_value;
 						console.log(constraint);
-						$http.post('http:/localhost:3000/rules' + '/' + constraint.rule_id + '/constraints' , constraint).success(function(data){
+						$http.post('http://192.168.1.30:3000/rules' + '/' + constraint.rule_id + '/constraints' , constraint).success(function(data){
 							console.log(data);
 							constraints.push(data);
 						});

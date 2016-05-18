@@ -6,7 +6,7 @@
 	$scope.actions = [];
 
 		this.initActionList = function (rule) {
-			var apiURL = 'http:/localhost:3000/rules/' + rule.rule_id + '/actions'
+			var apiURL = 'http://192.168.1.30:3000/rules/' + rule.rule_id + '/actions'
 			$http.get(apiURL).success(function(data){
 				$scope.actions = data;
 				console.log($scope.actions);
@@ -20,7 +20,7 @@
 	$scope.constraints = [];
 
 		this.initConstraintList = function (rule) {
-			var apiURL = 'http:/localhost:3000/rules/' + rule.rule_id + '/constraints'
+			var apiURL = 'http://192.168.1.30:3000/rules/' + rule.rule_id + '/constraints'
 			$http.get(apiURL).success(function(data){
 				$scope.constraints = data;
 				console.log($scope.constraints);
@@ -53,7 +53,7 @@
 
 
 				this.deleteRule = function (rule,rules) {
-					$http.delete('http:/localhost:3000/rules' + '/' + rule.rule_id);
+					$http.delete('http://192.168.1.30:3000/rules' + '/' + rule.rule_id);
 					index = rules.findIndex(x => x.rule_id==rule.rule_id);
 					rules.splice (index, 1);
 				};
@@ -72,7 +72,7 @@
 						rule.rule_name = this.editRule.rule_name;
 						rule.rule_description = this.editRule.rule_description;
 						rule.rule_active = this.editRule.rule_active;
-						$http.put('http:/localhost:3000/rules' + '/' + rule.rule_id, rule)
+						$http.put('http://192.168.1.30:3000/rules' + '/' + rule.rule_id, rule)
 						this.setEdit(0);
 					}
 				};
@@ -111,7 +111,7 @@
 						this.editRule.rule_description;
 						this.editRule.rule_active;
 						console.log(this.editRule);
-						$http.post('http:/localhost:3000/rules', this.editRule).success(function(data){
+						$http.post('http://192.168.1.30:3000/rules', this.editRule).success(function(data){
 							console.log(data);
 							rules.push(data);
 						});

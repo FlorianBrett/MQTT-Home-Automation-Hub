@@ -146,17 +146,18 @@ void DBHandler::setStateValue(std::string device,std::string field,std::string v
 {
 	std::string sql;
 	sqlite3_stmt *sqlStatement;
-	sql = "UPDATE field SET field_value = '" + value + "' WHERE device_id = '" + device + "' AND field_id = '" + field + "';";
+	sql = "UPDATE field SET field_value = " + value + " WHERE device_id = '" + device + "' AND field_id = '" + field + "';";
 	logger->trace() << "SQL Statement : " << sql;
 
 	if(sqlite3_prepare_v2(db, sql.c_str(), -1, &sqlStatement, 0) == SQLITE_OK) {
-		sqlite3_step(sqlStatement);
+		std::cout << "set result code: "<< field << " / " << sqlite3_step(sqlStatement) <<  "\n";
 		logger->debug() << "State updated for " << device << "/" << field <<" to: " << value;
 	}
 	else
 		logger->error() <<"sqlite Prepare fail" << '\n';
 
 	sqlite3_finalize(sqlStatement);
+
 	if(loadConfig("state_history").compare("1") == 0)
 		addStateHistory(device, field, value);
 }
@@ -177,12 +178,31 @@ void DBHandler::addStateHistory(std::string device,std::string field,std::string
 	sqlite3_finalize(sqlStatement);
 
 }
+void DBHandler::addRuleHistory(std::string ruleID)
+{
+	std::string sql;
+	sqlite3_stmt *sqlStatement;
+	//TODO Ensure time stored is correct(Could be an hour out)
+	sql = "INSERT INTO rule_history(rule_id,rule_history_time) VALUES (" + ruleID + ",CURRENT_TIMESTAMP);";
+	logger->trace() << "SQL Statement : " << sql;
+
+	if(sqlite3_prepare_v2(db, sql.c_str(), -1, &sqlStatement, 0) == SQLITE_OK) {
+		sqlite3_step(sqlStatement);
+		logger->debug() << "Rule History inserted for " << ruleID;
+	}
+	else
+		logger->error() <<"sqlite Prepare fail";
+	sqlite3_finalize(sqlStatement);
+
+}
 std::vector<std::string> DBHandler::getRuleIDs(std::string device,std::string field)
 {
+	//TODO Get only active rules
 	std::string sql;
 	std::vector<std::string> results;
 	sqlite3_stmt *sqlStatement;
-	sql = "SELECT DISTINCT rule_id FROM rule_constraint WHERE field_id ='" + field + "';";
+	//sql = "SELECT DISTINCT rule_id FROM rule_constraint WHERE field_id ='" + field + "';";
+	sql = "SELECT rule_constraint.rule_id, FROM rule_constraint INNER JOIN rule ON rule_constraint.rule_id=rule.rule_id WHERE rule.rule_active=1 AND field_id ='" + field + "';";
 	logger->trace() << "SQL Statement : " << sql;
 
 	if(sqlite3_prepare_v2(db, sql.c_str(), -1, &sqlStatement, 0) == SQLITE_OK)
@@ -242,10 +262,10 @@ std::vector<std::string> DBHandler::getConstraint(std::string constraintID)
 			results.push_back(std::string((char*)sqlite3_column_text(sqlStatement, 3)));
 
 			std::string debug = "getConstraint Results: ";
-			debug += (char*)sqlite3_column_text(sqlStatement, 0) + ',';
-			debug += (char*)sqlite3_column_text(sqlStatement, 1) + ',';
-			debug += (char*)sqlite3_column_text(sqlStatement, 2) + ',';
-			debug += (char*)sqlite3_column_text(sqlStatement, 3) + ',';
+			debug += std::string((char*)sqlite3_column_text(sqlStatement, 0)) + ',';
+			debug += std::string((char*)sqlite3_column_text(sqlStatement, 1)) + ',';
+			debug += std::string((char*)sqlite3_column_text(sqlStatement, 2)) + ',';
+			debug += std::string((char*)sqlite3_column_text(sqlStatement, 3)) + ',';
 			logger->debug(debug);
 		}
 	}
@@ -338,7 +358,7 @@ std::vector<std::array<int,2>> DBHandler::getTimerRules()
 }
 std::vector<std::array<int,2>> DBHandler::getTimerRules(int startTime, int finishTime)
 {
-
+	//TODO Get only active rules
 	std::string sql;
 	std::vector<std::array<int,2>> results;
 	sqlite3_stmt *sqlStatement;
@@ -365,7 +385,7 @@ std::vector<std::array<int,2>> DBHandler::getTimerRules(int startTime, int finis
 }
 void DBHandler::closeDB()
 {
-	//sqlite3_close(db);
+	sqlite3_close(db);
 	//logger->debug() << "DB connection closed";
 }
 

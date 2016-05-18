@@ -14,7 +14,7 @@
 #include <condition_variable>
 class MQTTMessageBuffer {
 private:
-	std::deque<MQTTMessage> inMessageBuffer;
+	std::deque<MQTTMessage> messageBuffer;
     unsigned int bufferSize;
     std::mutex mtx;
     std::condition_variable cv;
